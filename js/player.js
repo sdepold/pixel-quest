@@ -4,6 +4,7 @@ window.PixelQuest.Player = (function() {
   var Player = function() {
     this.x = 10
     this.y = 10
+    this.movementDelay = 50
   }
 
   Player.prototype.render = function(ctx) {
