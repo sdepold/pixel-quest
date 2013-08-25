@@ -12,5 +12,14 @@ window.PixelQuest.Player = (function() {
     ctx.fillRect(this.x, this.y, 30, 30)
   }
 
+  Player.prototype.toJSON = function() {
+    var data = this.options
+
+    data.x = this.x
+    data.y = this.y
+
+    return data
+  }
+
   return Player
 })()
