@@ -31,7 +31,7 @@ window.PixelQuest.Interaction = (function() {
 
     window.setInterval(function() {
       setPlayerPosition.call(self)
-    }, this.player.movementDelay)
+    }, this.player.options.movementDelay)
   }
 
   // private

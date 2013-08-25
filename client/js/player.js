@@ -1,10 +1,10 @@
 window.PixelQuest.Player = (function() {
   "use strict"
 
-  var Player = function() {
-    this.x = 10
-    this.y = 10
-    this.movementDelay = 50
+  var Player = function(x, y, options) {
+    this.x       = x
+    this.y       = y
+    this.options = options || {}
   }
 
   Player.prototype.render = function(ctx) {
