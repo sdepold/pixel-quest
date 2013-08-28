@@ -34,14 +34,15 @@ WebSocket.prototype.observeEvents = function(socket) {
       }
     },
 
-    'disconnect': function(data) {
-      if (this.db.players[data.id]) {
-        this.db.players[data.id].online = false
-        this.db.players[data.id].offlineSince = +new Date()
+    'disconnect': function() {
+      if (this.db.players[socket.playerId]) {
+        this.db.players[socket.playerId].online = false
+        this.db.players[socket.playerId].offlineSince = +new Date()
       }
     },
 
     'player#join': function(data) {
+      socket.playerId       = data.id
       this.sockets[data.id] = socket
 
       if (!this.db.players[data.id]) {
