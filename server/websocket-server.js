@@ -1,12 +1,11 @@
-var io = require('socket.io')
+var io    = require('socket.io')
+  , World = require('./world.js')
 
 var WebSocket = module.exports = function(server) {
   this.server  = server
   this.io      = null
   this.sockets = {}
-  this.db      = {
-    players: {}
-  }
+  this.world   = new World()
 }
 
 WebSocket.prototype.listen = function() {
@@ -26,19 +25,21 @@ WebSocket.prototype.listen = function() {
 }
 
 WebSocket.prototype.observeEvents = function(socket) {
-  var self   = this
+  var self = this
 
   this.events = {
     'player#update': function(data) {
-      if (this.db.players[data.id]) {
-        this.db.players[data.id] = data
+      if (this.world.getPlayer(data.id)) {
+        this.world.setPlayer(data.id, data)
       }
     },
 
     'disconnect': function() {
-      if (this.db.players[socket.playerId]) {
-        this.db.players[socket.playerId].online = false
-        this.db.players[socket.playerId].offlineSince = +new Date()
+      if (this.world.getPlayer(socket.playerId)) {
+        this.world.updatePlayer(socket.playerId, {
+          online:       false,
+          offlineSince: +new Date()
+        })
       }
     },
 
@@ -46,15 +47,17 @@ WebSocket.prototype.observeEvents = function(socket) {
       socket.playerId       = data.id
       this.sockets[data.id] = socket
 
-      if (!this.db.players[data.id]) {
-        this.db.players[data.id] = { x: 50, y: 70, movementDelay: 50, stepSize: 5 }
+      if (!this.world.getPlayer(data.id)) {
+        this.world.createPlayer(data.id)
       }
 
-      this.db.players[data.id].online       = true
-      this.db.players[data.id].offlineSince = null
-      this.db.players[data.id].id           = data.id
+      this.world.updatePlayer(data.id, {
+        online:       true,
+        offlineSince: null,
+        id:           data.id
+      })
 
-      socket.emit('player#joined', this.db.players[data.id])
+      socket.emit('player#joined', this.world.getPlayer(data.id))
     }
   }
 
@@ -73,8 +76,8 @@ WebSocket.prototype.syncWorld = function() {
   Object.keys(this.sockets).forEach(function(playerIdOfSocket) {
     var socket  = self.sockets[playerIdOfSocket]
 
-    var players = Object.keys(self.db.players).map(function(playerId) {
-      var player = self.db.players[playerId]
+    var players = Object.keys(self.world.players).map(function(playerId) {
+      var player = self.world.getPlayer(playerId)
 
       if ((player.id != playerIdOfSocket) && (player.online || ((+new Date - player.offlineSince) < 5000))) {
         return player

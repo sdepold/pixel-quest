@@ -15,10 +15,10 @@ Server.prototype.onRequest = function(req, res) {
 
   if (req.url === '/') {
     res.writeHead(200, { 'Content-Type': utils.contentTypeForUrl(req.url) })
-    res.end(fs.readFileSync(__dirname + '/../../client/index.html'))
+    res.end(fs.readFileSync(__dirname + '/../client/index.html'))
   } else {
     try {
-      var content = fs.readFileSync(__dirname + "/../../client" + req.url)
+      var content = fs.readFileSync(__dirname + "/../client" + req.url)
       res.writeHead(200, { 'Content-Type': utils.contentTypeForUrl(req.url) })
       res.end(content)
     } catch (e) {
