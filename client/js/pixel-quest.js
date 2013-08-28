@@ -42,14 +42,10 @@ window.PixelQuest = (function() {
   PixelQuest.prototype.connectToServer = function(callback) {
     var self = this
 
-    if (document.location.href.indexOf('heroku') !== -1) {
-      io.configure(function () {
-        io.set("transports", ["xhr-polling"]);
-        io.set("polling duration", 10);
-      });
-    }
+    this.socket = io.connect("http://" + document.location.host, {
 
-    this.socket = io.connect("http://" + document.location.host)
+    this.socket.set("transports", ["xhr-polling"]);
+    this.socket.set("polling duration", 10);
 
     this.socket.on('world#sync', this.onWorldSync.bind(this))
 
