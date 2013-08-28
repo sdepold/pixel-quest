@@ -34,7 +34,7 @@ WebSocket.prototype.observeEvents = function(socket) {
       }
     },
 
-    'player#quit': function(data) {
+    'disconnect': function(data) {
       if (this.db.players[data.id]) {
         this.db.players[data.id].online = false
         this.db.players[data.id].offlineSince = +new Date()
