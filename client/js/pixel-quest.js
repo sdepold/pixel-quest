@@ -11,7 +11,7 @@ window.PixelQuest = (function() {
       if (this.player && this.socket) {
         this.socket.emit('player#update', this.player.toJSON())
       }
-    }.bind(this), 100)
+    }.bind(this), 10)
 
     // connect to the server and load the user's data
     this.connectToServer(function(playerData) {

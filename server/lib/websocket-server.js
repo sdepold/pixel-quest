@@ -21,7 +21,7 @@ WebSocket.prototype.listen = function() {
 
   setInterval(function() {
     self.syncWorld()
-  }, 100)
+  }, 10)
 }
 
 WebSocket.prototype.observeEvents = function(socket) {
