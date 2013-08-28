@@ -1,6 +1,14 @@
 var World = module.exports = function() {
+  var self = this
+
   this.players = {}
   this.monsters = {}
+
+  setInterval(function() {
+    if (Object.keys(self.monsters).length < 10) {
+      self.spawnMonsters()
+    }
+  }, 1000)
 }
 
 World.prototype.getPlayer = function(id) {
@@ -28,4 +36,27 @@ World.prototype.updatePlayer = function(id, data) {
   })
 
   this.setPlayer(id, player)
+}
+
+World.prototype.spawnMonsters = function() {
+  var generateIdentifier = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+      return v.toString(16);
+    })
+  }
+
+
+  var width = Math.random() * 50
+
+  var data = {
+    id:     generateIdentifier(),
+    x:      Math.random() * 1000,
+    y:      Math.random() * 1000,
+    height: width,
+    width:  width,
+    color:  '#' + (Math.random().toString(16) + '000000').slice(2, 8)
+  }
+
+  this.monsters[data.id] = data
 }

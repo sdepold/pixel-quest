@@ -15,7 +15,13 @@ window.PixelQuest.Game = (function() {
     this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
     Object.keys(this.objects).forEach(function(objectId) {
-      self.objects[objectId].render(self.ctx)
+      var object = self.objects[objectId]
+
+      if (object instanceof window.PixelQuest.Monster) {
+        console.log(object)
+      }
+
+      object.render(self.ctx)
     })
   }
 

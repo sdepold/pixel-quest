@@ -65,7 +65,7 @@ window.PixelQuest = (function() {
     data.forEach(function(playerData) {
       var object = self.game.objects[playerData.id]
 
-      if (playerData.online) {
+      if (playerData.online || !(object instanceof window.PixelQuest.Player)) {
         if (!!object) {
           object.update(playerData)
         } else {

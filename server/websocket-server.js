@@ -86,7 +86,12 @@ WebSocket.prototype.syncWorld = function() {
       return !!player
     })
 
+    var monsters = Object.keys(self.world.monsters).map(function(id) {
+      return self.world.monsters[id]
+    })
+
     console.log('Emitting world#sync with the following arguments', players)
     socket.emit('world#sync', 'Player', players)
+    socket.emit('world#sync', 'Monster', monsters)
   })
 }
