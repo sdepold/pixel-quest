@@ -51,18 +51,24 @@ window.PixelQuest = (function() {
   }
 
   PixelQuest.prototype.onWorldSync = function(type, data) {
-    var object = this.game.objects[data.id]
+    var klass  = PixelQuest[type]
+      , self   = this
 
-    if (data.online) {
-      if (!!object) {
-        object.update(data)
-      } else {
-        object = new PixelQuest[type](data.id, data)
-        this.game.addObject(object)
+    data.forEach(function(playerData) {
+      var object = self.game.objects[playerData.id]
+
+      if (playerData.online) {
+        if (!!object) {
+          object.update(playerData)
+        } else {
+          object = new klass(playerData.id, playerData)
+          self.game.addObject(object)
+        }
+      } else if (!!object && !playerData.online) {
+        self.game.removeObject(object)
       }
-    } else if (!!object && !data.online) {
-      this.game.removeObject(object)
-    }
+    })
+
   }
 
   PixelQuest.prototype.observeBrowserState = function() {

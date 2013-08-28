@@ -13,7 +13,13 @@ WebSocket.prototype.listen = function() {
   var self = this
 
   this.io = io.listen(this.server.httpServer)
+
   this.io.set('log level', 1);
+
+  if (process.env.NODE_ENV === 'production') {
+    this.io.set("transports", ["xhr-polling"])
+    this.io.set("polling duration", 10)
+  }
 
   this.io.sockets.on('connection', function (socket) {
     self.observeEvents(socket)
@@ -70,17 +76,19 @@ WebSocket.prototype.syncWorld = function() {
   var self = this
 
   Object.keys(this.sockets).forEach(function(playerIdOfSocket) {
-    var socket = self.sockets[playerIdOfSocket]
+    var socket  = self.sockets[playerIdOfSocket]
 
-    Object.keys(self.db.players).forEach(function(playerId) {
-      if (playerId != playerIdOfSocket) {
-        var player = self.db.players[playerId]
+    var players = Object.keys(self.db.players).map(function(playerId) {
+      var player = self.db.players[playerId]
 
-        if (player.online || ((+new Date - player.offlineSince) < 5000)) {
-          console.log('Emitting world#sync with the following arguments', player)
-          socket.emit('world#sync', 'Player', player)
-        }
+      if ((player.id != playerIdOfSocket) && (player.online || ((+new Date - player.offlineSince) < 5000))) {
+        return player
       }
+    }).filter(function(player) {
+      return !!player
     })
+
+    console.log('Emitting world#sync with the following arguments', players)
+    socket.emit('world#sync', 'Player', players)
   })
 }
