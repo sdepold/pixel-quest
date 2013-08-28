@@ -42,10 +42,10 @@ window.PixelQuest = (function() {
   PixelQuest.prototype.connectToServer = function(callback) {
     var self = this
 
-    this.socket = io.connect("http://" + document.location.host)
-
-    this.socket.set("transports", ["xhr-polling"]);
-    this.socket.set("polling duration", 10);
+    this.socket = io.connect("http://" + document.location.host, {
+      "transports": ["xhr-polling"],
+      "polling duration": 10
+    })
 
     this.socket.on('world#sync', this.onWorldSync.bind(this))
 
