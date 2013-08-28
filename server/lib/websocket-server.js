@@ -16,11 +16,6 @@ WebSocket.prototype.listen = function() {
 
   this.io.set('log level', 1);
 
-  if (process.env.NODE_ENV === 'production') {
-    this.io.set("transports", ["xhr-polling"])
-    this.io.set("polling duration", 10)
-  }
-
   this.io.sockets.on('connection', function (socket) {
     self.observeEvents(socket)
   })
