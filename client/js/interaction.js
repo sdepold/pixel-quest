@@ -42,16 +42,16 @@ window.PixelQuest.Interaction = (function() {
     this.activeKeys.forEach(function(key) {
       switch (key) {
         case 37:
-          self.player.x = self.player.x - self.movementDelta
+          self.player.move('left')
           break
         case 38:
-          self.player.y = self.player.y - self.movementDelta
+          self.player.move('up')
           break
         case 39:
-          self.player.x = self.player.x + self.movementDelta
+          self.player.move('right')
           break
         case 40:
-          self.player.y = self.player.y + self.movementDelta
+          self.player.move('down')
           break
       }
     })
