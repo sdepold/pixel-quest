@@ -16,6 +16,9 @@ window.PixelQuest.Player = (function() {
       feet: {
         direction: 'down',
         offset: 0
+      },
+      weapon: {
+        side: 'right'
       }
     }
   }
@@ -58,9 +61,11 @@ window.PixelQuest.Player = (function() {
     switch (direction) {
       case 'left':
         this.options.x = this.options.x - step
+        this.renderOptions.weapon.side = 'left'
         break
       case 'right':
         this.options.x = this.options.x + step
+        this.renderOptions.weapon.side = 'right'
         break
       case 'up':
         this.options.y = this.options.y - step
@@ -154,7 +159,7 @@ window.PixelQuest.Player = (function() {
   var renderHair = function(ctx) {
     var self = this
       , px   = this.renderOptions.pixelSize
-      , y  = this.options.y + ~~this.renderOptions.feet.offset
+      , y    = this.options.y + ~~this.renderOptions.feet.offset
 
     ctx.fillStyle = this.renderOptions.colors.outline
 
@@ -168,8 +173,21 @@ window.PixelQuest.Player = (function() {
 
     switch (weapon) {
       case 'sword':
+        renderSword.call(this, ctx)
         break
     }
+  }
+
+  var renderSword = function(ctx) {
+    var self = this
+      , px   = this.renderOptions.pixelSize
+      , x    = px + ((this.renderOptions.weapon.side === 'left') ? this.options.x - px * 3 : this.options.x + this.renderOptions.width)
+      , y    = this.options.y + ~~this.renderOptions.feet.offset
+
+    ctx.fillStyle = this.renderOptions.colors.outline
+
+    ctx.fillRect(x, y - px * 4, px, px * 5)
+    ctx.fillRect(x - px, y - px , px * 3, px )
   }
 
   return Player
