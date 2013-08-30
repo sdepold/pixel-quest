@@ -7,8 +7,6 @@ window.PixelQuest.Monster = (function() {
   }
 
   Monster.prototype.render = function(ctx) {
-    console.log('noot')
-
     ctx.fillStyle = this.options.color
 
     ctx.fillRect(

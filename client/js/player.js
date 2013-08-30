@@ -6,11 +6,17 @@ window.PixelQuest.Player = (function() {
     this.isActivePlayer = (id === window.PixelQuest.Player.getIdentifier())
     this.options        = options || {}
     this.renderOptions  = {
-      color:          "#F2D5C0",
-      arrowOffset:    0,
-      arrowDirection: "up",
-      width:          30,
-      height:         30
+      colors: {
+        outline: "#F2D5C0",
+        face:    "#FFFFFF"
+      },
+      width: 21,
+      height: 14,
+      pixelSize: 3,
+      feet: {
+        direction: 'down',
+        offset: 0
+      }
     }
   }
 
@@ -39,18 +45,11 @@ window.PixelQuest.Player = (function() {
   }
 
   Player.prototype.render = function(ctx) {
-    ctx.fillStyle = this.renderOptions.color
-
-    ctx.fillRect(
-      this.options.x,
-      this.options.y,
-      this.renderOptions.width,
-      this.renderOptions.height
-    )
-
-    if (this.isActivePlayer) {
-      renderArrow.call(this, ctx)
-    }
+    renderBody.call(this, ctx)
+    renderArms.call(this,ctx)
+    renderWeapon.call(this, ctx)
+    renderHair.call(this, ctx)
+    renderFeet.call(this, ctx)
   }
 
   Player.prototype.move = function(direction, step) {
@@ -84,37 +83,92 @@ window.PixelQuest.Player = (function() {
 
   // private
 
-  var renderArrow = function(ctx) {
-    var width = 4
+  var renderBody = function(ctx) {
+    var px = this.renderOptions.pixelSize
+      , y  = this.options.y + ~~this.renderOptions.feet.offset
 
+    ctx.fillStyle = this.renderOptions.colors.outline
+
+    ctx.fillRect(this.options.x, y, this.renderOptions.width, this.renderOptions.height)
+    ctx.fillRect(this.options.x + px, y - px, this.renderOptions.width - px * 2, px)
     ctx.fillRect(
-      this.options.x + this.renderOptions.width / 2 - width / 2,
-      this.options.y - width * 2 - parseInt(this.renderOptions.arrowOffset),
-      width, width
+      this.options.x + px,
+      y + this.renderOptions.height,
+      this.renderOptions.width - px * 2,
+      px
     )
 
+    // face
+    ctx.fillStyle = this.renderOptions.colors.face
     ctx.fillRect(
-      this.options.x + this.renderOptions.width / 2 - width / 2 - width,
-      this.options.y - width * 2 - parseInt(this.renderOptions.arrowOffset) - width,
-      width, width
+      this.options.x + px,
+      y,
+      this.renderOptions.width - px * 2,
+      this.renderOptions.height - px
     )
 
-    ctx.fillRect(
-      this.options.x + this.renderOptions.width / 2 - width / 2 + width,
-      this.options.y - width * 2 - parseInt(this.renderOptions.arrowOffset) - width,
-      width, width
-    )
+    // eyes
+    ctx.fillStyle = this.renderOptions.colors.outline
+    ctx.fillRect(this.options.x + px * 2, y + px, px, px)
+    ctx.fillRect(this.options.x + this.renderOptions.width - px * 3, y + px, px, px)
+  }
 
-    if (this.renderOptions.arrowOffset === 5) {
-      this.renderOptions.arrowDirection = 'down'
-    } else if (this.renderOptions.arrowOffset === 0) {
-      this.renderOptions.arrowDirection = 'up'
+  var renderArms = function(ctx) {
+    var px = this.renderOptions.pixelSize
+      , y  = this.options.y + ~~this.renderOptions.feet.offset
+
+    ctx.fillStyle = this.renderOptions.colors.outline
+
+    // left
+    ctx.fillRect(this.options.x - px * 2, y + px * 2, px * 2, px)
+    ctx.fillRect(this.options.x - px * 2, y + px, px, px)
+
+    // right
+    ctx.fillRect(this.options.x + this.renderOptions.width, y + px * 2, px * 2, px)
+    ctx.fillRect(this.options.x + this.renderOptions.width + px, y + px, px, px)
+  }
+
+  var renderFeet = function(ctx) {
+    var px         = this.renderOptions.pixelSize
+      , y          = this.options.y + ~~this.renderOptions.feet.offset
+      , feetLength = ~~((this.renderOptions.height + px * 2) / 2)
+
+    ctx.fillStyle = this.renderOptions.colors.outline
+
+    ctx.fillRect(this.options.x + px * 2, y + this.renderOptions.height, px, feetLength - ~~this.renderOptions.feet.offset)
+    ctx.fillRect(this.options.x + this.renderOptions.width - px * 3, y + this.renderOptions.height, px, feetLength - ~~this.renderOptions.feet.offset)
+
+    if (this.renderOptions.feet.direction === 'up') {
+      this.renderOptions.feet.offset = this.renderOptions.feet.offset + 0.25
+    } else {
+      this.renderOptions.feet.offset = this.renderOptions.feet.offset - 0.25
     }
 
-    if (this.renderOptions.arrowDirection === 'up') {
-      this.renderOptions.arrowOffset = this.renderOptions.arrowOffset + 0.25
-    } else {
-      this.renderOptions.arrowOffset = this.renderOptions.arrowOffset - 0.25
+    if (this.renderOptions.feet.offset >= ~~(feetLength / 2)) {
+      this.renderOptions.feet.direction = 'down'
+    } else if (this.renderOptions.feet.offset <= 0) {
+      this.renderOptions.feet.direction = 'up'
+    }
+  }
+
+  var renderHair = function(ctx) {
+    var self = this
+      , px   = this.renderOptions.pixelSize
+      , y  = this.options.y + ~~this.renderOptions.feet.offset
+
+    ctx.fillStyle = this.renderOptions.colors.outline
+
+    ;([[0, 0], [-px, -px], [px, -px]]).forEach(function(pair) {
+      ctx.fillRect(self.options.x + ~~((self.renderOptions.width - px) / 2) + pair[0], y - px * 2 + pair[1], px, px)
+    })
+  }
+
+  var renderWeapon = function(ctx) {
+    var weapon = 'sword'
+
+    switch (weapon) {
+      case 'sword':
+        break
     }
   }
 
