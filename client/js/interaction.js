@@ -41,6 +41,9 @@ window.PixelQuest.Interaction = (function() {
 
     this.activeKeys.forEach(function(key) {
       switch (key) {
+        case 32:
+          self.player.attack()
+          break
         case 37:
           self.player.move('left')
           break

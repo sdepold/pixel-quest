@@ -4,6 +4,7 @@ window.PixelQuest.Player = (function() {
   var Player = function(id, options) {
     this.id             = id
     this.isActivePlayer = (id === window.PixelQuest.Player.getIdentifier())
+    this.attacking      = false
     this.options        = options || {}
     this.renderOptions  = {
       colors: {
@@ -18,7 +19,9 @@ window.PixelQuest.Player = (function() {
         offset: 0
       },
       weapon: {
-        side: 'right'
+        side: 'right',
+        direction: 'up',
+        angle: 0
       }
     }
   }
@@ -53,6 +56,12 @@ window.PixelQuest.Player = (function() {
     renderWeapon.call(this, ctx)
     renderHair.call(this, ctx)
     renderFeet.call(this, ctx)
+  }
+
+  Player.prototype.attack = function() {
+    if (!this.attacking) {
+      this.attacking = true
+    }
   }
 
   Player.prototype.move = function(direction, step) {
@@ -179,15 +188,35 @@ window.PixelQuest.Player = (function() {
   }
 
   var renderSword = function(ctx) {
-    var self = this
-      , px   = this.renderOptions.pixelSize
-      , x    = px + ((this.renderOptions.weapon.side === 'left') ? this.options.x - px * 3 : this.options.x + this.renderOptions.width)
-      , y    = this.options.y + ~~this.renderOptions.feet.offset
+    var self  = this
+      , px    = this.renderOptions.pixelSize
+      , x     = px + ((this.renderOptions.weapon.side === 'left') ? this.options.x - px * 3 : this.options.x + this.renderOptions.width)
+      , y     = this.options.y + ~~this.renderOptions.feet.offset + px
+      , angle = ((this.renderOptions.weapon.side === 'left') ? -1 : 1) * this.renderOptions.weapon.angle
 
     ctx.fillStyle = this.renderOptions.colors.outline
 
-    ctx.fillRect(x, y - px * 4, px, px * 5)
-    ctx.fillRect(x - px, y - px , px * 3, px )
+    ctx.translate(x, y)
+    ctx.rotate(angle)
+    ctx.fillRect(0, -px * 5, px, px * 5)
+    ctx.fillRect(-px, -px * 2 , px * 3, px )
+    ctx.rotate(-angle)
+    ctx.translate(-x, -y)
+
+    if (this.attacking)  {
+      if (this.renderOptions.weapon.direction === 'down') {
+        this.renderOptions.weapon.angle = this.renderOptions.weapon.angle - 0.1
+      } else {
+        this.renderOptions.weapon.angle = this.renderOptions.weapon.angle + 0.1
+      }
+
+      if (this.renderOptions.weapon.angle >= 1.4) {
+        this.renderOptions.weapon.direction = 'down'
+      } else if (this.renderOptions.weapon.angle <= 0) {
+        this.renderOptions.weapon.direction = 'up'
+        this.attacking = false
+      }
+    }
   }
 
   return Player
