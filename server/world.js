@@ -46,8 +46,9 @@ World.prototype.spawnMonsters = function() {
     })
   }
 
+  var width = 30 + (Math.random() * 30)
 
-  var width = Math.random() * 50
+  width = width - (width % 6)
 
   var data = {
     id:     generateIdentifier(),
