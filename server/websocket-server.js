@@ -21,7 +21,7 @@ WebSocket.prototype.listen = function() {
 
   setInterval(function() {
     self.syncWorld()
-  }, 10)
+  }, 50)
 }
 
 WebSocket.prototype.observeEvents = function(socket) {
@@ -35,6 +35,7 @@ WebSocket.prototype.observeEvents = function(socket) {
     },
 
     'disconnect': function() {
+      // console.log('Player', socket.playerId, 'just quit the game.')
       if (this.world.getPlayer(socket.playerId)) {
         this.world.updatePlayer(socket.playerId, {
           online:       false,
@@ -63,7 +64,7 @@ WebSocket.prototype.observeEvents = function(socket) {
 
   Object.keys(this.events).forEach(function(eventName) {
     socket.on(eventName, function() {
-      console.log('Received event', eventName, 'with the following arguments', arguments)
+      // console.log('Received event', eventName, 'with the following arguments', arguments)
       self.events[eventName].apply(self, arguments)
     })
   })
@@ -90,7 +91,7 @@ WebSocket.prototype.syncWorld = function() {
       return self.world.monsters[id]
     })
 
-    console.log('Emitting world#sync with the following arguments', players)
+    // console.log('Emitting world#sync with the following arguments', players)
     socket.emit('world#sync', 'Player', players)
     socket.emit('world#sync', 'Monster', monsters)
   })

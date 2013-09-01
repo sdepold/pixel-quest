@@ -5,27 +5,27 @@ window.PixelQuest = (function() {
   }
 
   PixelQuest.prototype.start = function() {
-    this.renderIntervalId = setInterval(function() {
-      this.game.render()
+    var self = this
 
-      if (this.player && this.socket) {
-        this.socket.emit('player#update', this.player.toJSON())
+    this.renderIntervalId = setInterval(function() {
+      self.game.render()
+
+      if (self.player && self.socket) {
+        self.socket.emit('player#update', self.player.toJSON())
       }
-    }.bind(this), 10)
+    }, 10)
 
     // connect to the server and load the user's data
     this.connectToServer(function(playerData) {
       var id = playerData.id
       delete playerData.id
 
-      this.player = new PixelQuest.Player(id, playerData)
-      this.game.addObject(this.player)
+      self.player = new PixelQuest.Player(id, playerData)
+      self.game.addObject(self.player)
 
-      var interaction = new PixelQuest.Interaction(this.player)
+      var interaction = new PixelQuest.Interaction(self.player)
       interaction.bindKeyboardToPlayer()
-
-      this.observeBrowserState()
-    }.bind(this))
+    })
   }
 
   PixelQuest.prototype.getPlayerId = function() {
@@ -62,29 +62,21 @@ window.PixelQuest = (function() {
     var klass  = PixelQuest[type]
       , self   = this
 
-    data.forEach(function(playerData) {
-      var object = self.game.objects[playerData.id]
+    data.forEach(function(objectData) {
+      var object = self.game.objects[objectData.id]
 
-      if (playerData.online || !(object instanceof window.PixelQuest.Player)) {
+      if (objectData.online || !(object instanceof window.PixelQuest.Player)) {
         if (!!object) {
-          object.update(playerData)
+          object.update(objectData)
         } else {
-          object = new klass(playerData.id, playerData)
+          object = new klass(objectData.id, objectData)
           self.game.addObject(object)
         }
-      } else if (!!object && !playerData.online) {
+      } else if (!!object && !objectData.online) {
         self.game.removeObject(object)
       }
     })
 
-  }
-
-  PixelQuest.prototype.observeBrowserState = function() {
-    var self = this
-
-    window.onbeforeunload = function() {
-      self.socket.emit('player#quit', { id: self.getPlayerId() })
-    }
   }
 
   return PixelQuest

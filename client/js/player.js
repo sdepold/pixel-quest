@@ -4,8 +4,12 @@ window.PixelQuest.Player = (function() {
   var Player = function(id, options) {
     this.id             = id
     this.isActivePlayer = (id === window.PixelQuest.Player.getIdentifier())
-    this.attacking      = false
-    this.options        = options || {}
+    this.options        = PixelQuest.Utils.extend({
+      x: 0,
+      y: 0,
+      stepSize: 10,
+      attacking: false
+    }, options || {}),
     this.renderOptions  = {
       colors: {
         outline: "#F2D5C0",
@@ -59,8 +63,8 @@ window.PixelQuest.Player = (function() {
   }
 
   Player.prototype.attack = function() {
-    if (!this.attacking) {
-      this.attacking = true
+    if (!this.options.attacking) {
+      this.options.attacking = true
     }
   }
 
@@ -86,13 +90,15 @@ window.PixelQuest.Player = (function() {
   }
 
   Player.prototype.toJSON = function() {
-    var data = this.options
-    data.id = this.id
-    return data
+    return PixelQuest.Utils.extend(this.options, { id: this.id })
   }
 
   Player.prototype.update = function(data) {
     this.options = data
+
+    if (this.options.attacking === false) {
+      this.renderOptions.weapon.angle = 0
+    }
   }
 
   // private
@@ -203,7 +209,7 @@ window.PixelQuest.Player = (function() {
     ctx.rotate(-angle)
     ctx.translate(-x, -y)
 
-    if (this.attacking)  {
+    if (this.options.attacking)  {
       if (this.renderOptions.weapon.direction === 'down') {
         this.renderOptions.weapon.angle = this.renderOptions.weapon.angle - 0.1
       } else {
@@ -214,7 +220,7 @@ window.PixelQuest.Player = (function() {
         this.renderOptions.weapon.direction = 'down'
       } else if (this.renderOptions.weapon.angle <= 0) {
         this.renderOptions.weapon.direction = 'up'
-        this.attacking = false
+        this.options.attacking = false
       }
     }
   }
