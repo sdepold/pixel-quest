@@ -23,5 +23,6 @@
     "exec-sync": "~0.1.6",
     "uglify-js": "~2.4.0",
     "yuicompressor": "~2.4.8"
-  }
+  },
+  "subdomain": "pixel-quest"
 }
