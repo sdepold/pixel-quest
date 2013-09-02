@@ -44,7 +44,7 @@ World.prototype.getMonsters = function() {
   var self = this
 
   return Object.keys(this.monsters).map(function(id) {
-    return self.monsters[id].animateFeet()
+    return self.monsters[id].iterate()
   })
 }
 
