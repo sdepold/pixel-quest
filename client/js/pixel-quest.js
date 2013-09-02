@@ -59,7 +59,7 @@ window.PixelQuest = (function() {
   }
 
   PixelQuest.prototype.onWorldSync = function(type, data) {
-    var klass  = PixelQuest[type]
+    var klass  = PixelQuest[type] || PixelQuest.Renderers[type]
       , self   = this
 
     data.forEach(function(objectData) {

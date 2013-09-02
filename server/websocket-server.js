@@ -21,7 +21,7 @@ WebSocket.prototype.listen = function() {
 
   setInterval(function() {
     self.syncWorld()
-  }, 50)
+  }, 10)
 }
 
 WebSocket.prototype.observeEvents = function(socket) {
@@ -75,24 +75,13 @@ WebSocket.prototype.syncWorld = function() {
   var self = this
 
   Object.keys(this.sockets).forEach(function(playerIdOfSocket) {
-    var socket  = self.sockets[playerIdOfSocket]
-
-    var players = Object.keys(self.world.players).map(function(playerId) {
-      var player = self.world.getPlayer(playerId)
-
-      if ((player.id != playerIdOfSocket) && (player.online || ((+new Date - player.offlineSince) < 5000))) {
-        return player
-      }
-    }).filter(function(player) {
-      return !!player
-    })
-
-    var monsters = Object.keys(self.world.monsters).map(function(id) {
-      return self.world.monsters[id]
-    })
+    var socket = self.sockets[playerIdOfSocket]
+      , data   = self.world.getSyncData(playerIdOfSocket)
 
     // console.log('Emitting world#sync with the following arguments', players)
-    socket.emit('world#sync', 'Player', players)
-    socket.emit('world#sync', 'Monster', monsters)
+
+    Object.keys(data).forEach(function(klass) {
+      socket.emit('world#sync', klass, data[klass])
+    })
   })
 }

@@ -7,7 +7,11 @@ window.PixelQuest.Utils = {
     })
 
     Object.keys(extension).forEach(function(key) {
-      result[key] = extension[key]
+      if (extension[key] === Object(extension[key])) {
+        result[key] = PixelQuest.Utils.extend(result[key], extension[key])
+      } else {
+        result[key] = extension[key]
+      }
     })
 
     return result

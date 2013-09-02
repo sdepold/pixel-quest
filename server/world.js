@@ -1,3 +1,5 @@
+var Monster = require('./entities/monster.js')
+
 var World = module.exports = function() {
   var self = this
 
@@ -38,26 +40,34 @@ World.prototype.updatePlayer = function(id, data) {
   this.setPlayer(id, player)
 }
 
+World.prototype.getMonsters = function() {
+  var self = this
+
+  return Object.keys(this.monsters).map(function(id) {
+    return self.monsters[id].animateFeet()
+  })
+}
+
 World.prototype.spawnMonsters = function() {
-  var generateIdentifier = function() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-      return v.toString(16);
-    })
+  var monster = new Monster()
+  this.monsters[monster.id] = monster
+}
+
+World.prototype.getSyncData = function(playerIdOfSocket) {
+  var self = this
+
+  var players = Object.keys(this.players).map(function(playerId) {
+    var player = self.getPlayer(playerId)
+
+    if ((player.id != playerIdOfSocket) && player.online) {
+      return player
+    }
+  }).filter(function(player) {
+    return !!player
+  })
+
+  return {
+    Player:  players,
+    Monster: this.getMonsters()
   }
-
-  var width = 30 + (Math.random() * 30)
-
-  width = width - (width % 6)
-
-  var data = {
-    id:     generateIdentifier(),
-    x:      Math.random() * 1000,
-    y:      Math.random() * 1000,
-    height: width,
-    width:  width,
-    color:  '#' + (Math.random().toString(16) + '000000').slice(2, 8)
-  }
-
-  this.monsters[data.id] = data
 }
