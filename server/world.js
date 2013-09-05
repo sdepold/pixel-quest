@@ -7,7 +7,7 @@ var World = module.exports = function() {
   this.monsters = {}
 
   setInterval(function() {
-    if (Object.keys(self.monsters).length < 10) {
+    if (self.getMonsters({ alive: true }).length < 10) {
       self.spawnMonsters()
     }
   }, 1000)
@@ -40,11 +40,34 @@ World.prototype.updatePlayer = function(id, data) {
   this.setPlayer(id, player)
 }
 
-World.prototype.getMonsters = function() {
+World.prototype.getMonster = function(id) {
+  return this.monsters[id]
+}
+
+World.prototype.getMonsters = function(options) {
   var self = this
 
+  options = options || {}
+
   return Object.keys(this.monsters).map(function(id) {
-    return self.monsters[id].iterate()
+    return self.monsters[id]
+  }).filter(function(monster) {
+    if (options.alive) {
+      monster.iterate()
+      return monster.alive()
+    } else {
+      monster.iterate()
+      return monster
+    }
+  })
+}
+
+World.prototype.findMonstersAtPosition = function(options) {
+  return this.getMonsters().filter(function(monster) {
+    return (monster.options.x < options.x) &&
+           ((monster.options.x + monster.options.width) > options.x) &&
+           (monster.options.y < options.y) &&
+           ((monster.options.y + monster.options.height + monster.options.renderOptions.pixelSize * 3) > options.y)
   })
 }
 
@@ -68,6 +91,6 @@ World.prototype.getSyncData = function(playerIdOfSocket) {
 
   return {
     Player:  players,
-    Monster: this.getMonsters()
+    Monster: this.getMonsters({ alive: true })
   }
 }

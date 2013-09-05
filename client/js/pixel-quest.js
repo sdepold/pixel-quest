@@ -23,7 +23,7 @@ window.PixelQuest = (function() {
       self.player = new PixelQuest.Player(id, playerData)
       self.game.addObject(self.player)
 
-      var interaction = new PixelQuest.Interaction(self.player)
+      var interaction = new PixelQuest.Interaction(self.player, self.socket)
       interaction.bindKeyboardToPlayer()
     })
   }
@@ -53,6 +53,10 @@ window.PixelQuest = (function() {
     this.socket = io.connect("http://" + document.location.host, options)
 
     this.socket.on('world#sync', this.onWorldSync.bind(this))
+    this.socket.on('monster#killed', function(monster) {
+      console.log('booya', monster.id, self.game.objects)
+      self.game.removeObject(monster)
+    })
 
     this.socket.on('player#joined', callback)
     this.socket.emit('player#join', { id: this.getPlayerId() })

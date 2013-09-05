@@ -8,6 +8,7 @@ window.PixelQuest.Player = (function() {
       x: 0,
       y: 0,
       stepSize: 10,
+      strength: 2,
       attacking: false,
       renderOptions: {
         colors: {
@@ -62,9 +63,10 @@ window.PixelQuest.Player = (function() {
     renderFeet.call(this, ctx)
   }
 
-  Player.prototype.attack = function() {
+  Player.prototype.attack = function(callback) {
     if (!this.options.attacking) {
-      this.options.attacking = true
+      this.options.attacking      = true
+      this.options.attackCallback = callback
     }
   }
 
@@ -214,6 +216,10 @@ window.PixelQuest.Player = (function() {
 
       if (this.options.renderOptions.weapon.angle >= 1.4) {
         this.options.renderOptions.weapon.direction = 'down'
+        if (this.isActivePlayer && this.options.attackCallback) {
+          this.options.attackCallback()
+          this.options.attackCallback = null
+        }
       } else if (this.options.renderOptions.weapon.angle <= 0) {
         this.options.renderOptions.weapon.direction = 'up'
         this.options.attacking = false

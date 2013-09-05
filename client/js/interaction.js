@@ -1,6 +1,7 @@
 window.PixelQuest.Interaction = (function() {
-  var Interaction = function(player) {
+  var Interaction = function(player, socket) {
     this.player        = player
+    this.socket        = socket
     this.movementDelta = 5
     this.activeKeys    = []
   }
@@ -42,7 +43,7 @@ window.PixelQuest.Interaction = (function() {
     this.activeKeys.forEach(function(key) {
       switch (key) {
         case 32:
-          self.player.attack()
+          self.player.attack(onAttacked.bind(self))
           break
         case 37:
           self.player.move('left')
@@ -58,6 +59,10 @@ window.PixelQuest.Interaction = (function() {
           break
       }
     })
+  }
+
+  var onAttacked = function() {
+    this.socket.emit('player#attack', this.player.id)
   }
 
   return Interaction

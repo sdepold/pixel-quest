@@ -59,6 +59,30 @@ WebSocket.prototype.observeEvents = function(socket) {
       })
 
       socket.emit('player#joined', this.world.getPlayer(data.id))
+    },
+
+    'player#attack': function(playerId) {
+      var player = this.world.getPlayer(playerId)
+
+      if (player) {
+        this.world.findMonstersAtPosition({
+          y: player.y + ~~(player.renderOptions.height / 2),
+          x: (
+            (player.renderOptions.weapon.direction === 'left') ? (
+              player.x - 7 * player.renderOptions.pixelSize
+            ) : (
+              player.x + player.renderOptions.width + 7 * player.renderOptions.pixelSize
+            )
+          ),
+          delta: (player.renderOptions.weapon.direction === 'left') ? -20 : 20
+        }).forEach(function(monster) {
+          monster.hit(player.strength, player.renderOptions.weapon.direction)
+
+          if (monster.options.hp === 0) {
+            socket.emit('monster#killed', monster)
+          }
+        })
+      }
     }
   }
 

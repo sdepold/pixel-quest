@@ -1,19 +1,28 @@
 var utils = require('../utils.js')
 
 var Monster = module.exports = function() {
-  var width = 30 + (Math.random() * 30)
-  width     = width - (width % 6)
+  var weight = 30 + (Math.random() * 30)
+  weight     = weight - (weight % 6)
+
+  var hp = (Math.pow(weight,2) / Math.pow(60,2)) * 100
 
   this.id      = utils.generateIdentifier()
   this.options = {
-    id:        this.id,
-    x:         Math.random() * 1000,
-    y:         Math.random() * 1000,
-    height:    width,
-    width:     width,
-    color:     '#' + (Math.random().toString(16) + '000000').slice(2, 8),
-    target:    null,
-    walkSpeed: 20,
+    id:         this.id,
+    x:          Math.random() * 1000,
+    y:          Math.random() * 1000,
+    height:     weight,
+    width:      weight,
+    color:      '#' + (Math.random().toString(16) + '000000').slice(2, 8),
+    target:     null,
+    walkSpeed:  (Math.pow(60,2) / Math.pow(weight,2)) * 10,
+    hp:         hp,
+    originalHp: hp,
+    attackedOptions: {
+      attacked:  false,
+      diff:      0,
+      direction: 'left'
+    },
     renderOptions: {
       pixelSize: 6,
       feet: {
@@ -31,10 +40,32 @@ var Monster = module.exports = function() {
 }
 
 Monster.prototype.iterate = function() {
-  this.animateFeet()
-  this.walk()
+  if (this.options.attackedOptions.attacked) {
+    if (this.options.attackedOptions.diff < 31) {
+      var distance = 5
+      this.options.x = this.options.x + ((this.options.attackedOptions.direction === 'left' ? -1 : 1) * 5)
+      this.options.attackedOptions.diff = this.options.attackedOptions.diff + 5
+    } else {
+      this.options.attackedOptions.attacked = false
+      this.options.attackedOptions.diff = 0
+      this.options.target = null
+    }
+  } else {
+    this.animateFeet()
+    this.walk()
+  }
 
   return this
+}
+
+Monster.prototype.hit = function(strength, direction) {
+  this.options.hp = Math.max.call(this, 0, this.options.hp - strength)
+  this.options.attackedOptions.attacked = true
+  this.options.attackedOptions.direction = direction
+}
+
+Monster.prototype.alive = function() {
+  return this.options.hp > 0
 }
 
 Monster.prototype.getTarget = function() {

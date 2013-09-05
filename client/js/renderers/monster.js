@@ -10,6 +10,7 @@ window.PixelQuest.Renderers.Monster = (function() {
     renderBody.call(this, ctx)
     renderArms.call(this, ctx)
     renderFeet.call(this, ctx)
+    renderHealth.call(this, ctx)
   }
 
   Monster.prototype.toJSON = function() {
@@ -71,6 +72,21 @@ window.PixelQuest.Renderers.Monster = (function() {
     ctx.fillRect(this.monster.options.x + this.monster.options.width - 2 * px, y + this.monster.options.height - 1, px, px * 3 - this.monster.options.renderOptions.feet.offset)
     ctx.fillRect(this.monster.options.x + 1, y + this.monster.options.height + 2 * px - 1 - this.monster.options.renderOptions.feet.offset, px, px)
     ctx.fillRect(this.monster.options.x + this.monster.options.width - 1 - px, y + this.monster.options.height + 2 * px - 1 - this.monster.options.renderOptions.feet.offset, px, px)
+  }
+
+  var renderHealth = function(ctx) {
+    var px    = this.monster.options.renderOptions.pixelSize
+      , y     = this.monster.options.y + this.monster.options.renderOptions.feet.offset
+      , count = ~~((this.monster.options.width - px) / (px + 2))
+
+    ctx.fillStyle = '#FFFFFF'
+
+    ctx.fillRect(
+      this.monster.options.x + px,
+      y + this.monster.options.height - 4,
+      (this.monster.options.width - 2 * px) * (this.monster.options.hp / this.monster.options.originalHp),
+      2
+    )
   }
 
   return Monster
