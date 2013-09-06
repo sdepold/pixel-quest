@@ -10,7 +10,12 @@ window.PixelQuest.Renderers.Monster = (function() {
     renderBody.call(this, ctx)
     renderArms.call(this, ctx)
     renderFeet.call(this, ctx)
-    renderHealth.call(this, ctx)
+
+    if (this.monster.options.hp !== this.monster.options.originalHp) {
+      renderHealth.call(this, ctx)
+    }
+
+    renderDamage.call(this, ctx)
   }
 
   Monster.prototype.toJSON = function() {
@@ -87,6 +92,19 @@ window.PixelQuest.Renderers.Monster = (function() {
       (this.monster.options.width - 2 * px) * (this.monster.options.hp / this.monster.options.originalHp),
       2
     )
+  }
+
+  var renderDamage = function(ctx) {
+    var self = this
+
+    ctx.font = "bold 12px sans-serif"
+
+    this.monster.options.renderOptions.damages.forEach(function(damage) {
+      var opacity = 1 - damage.step / 10
+
+      ctx.fillStyle = 'rgba(200, 0, 0, ' + opacity + ')'
+      ctx.fillText(damage.damage, damage.x, damage.y - damage.step);
+    })
   }
 
   return Monster

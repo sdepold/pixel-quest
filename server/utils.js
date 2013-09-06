@@ -1,4 +1,25 @@
 module.exports = {
+  extend: function(obj, extension, filter) {
+    var result = {}
+      , self   = this
+
+    Object.keys(obj).forEach(function(key) {
+      result[key] = obj[key]
+    })
+
+    Object.keys(extension).forEach(function(key) {
+      if (!filter || (filter.indexOf(key) !== -1)) {
+        if (extension[key] === Object(extension[key])) {
+          result[key] = self.extend(result[key], extension[key])
+        } else {
+          result[key] = extension[key]
+        }
+      }
+    })
+
+    return result
+  },
+
   log: function(s) {
     console.log(new Date().toISOString() + ":", s)
   },

@@ -1,4 +1,5 @@
-var Monster = require('./entities/monster.js')
+var Player  = require('./entities/player.js')
+  , Monster = require('./entities/monster.js')
 
 var World = module.exports = function() {
   var self = this
@@ -13,8 +14,14 @@ var World = module.exports = function() {
   }, 1000)
 }
 
-World.prototype.getPlayer = function(id) {
-  return this.players[id]
+World.prototype.getPlayer = function(id, options) {
+  var result = this.players[id]
+
+  if (!result && (options || {}).create) {
+    result = this.createPlayer(id)
+  }
+
+  return result
 }
 
 World.prototype.setPlayer = function(id, data) {
@@ -22,12 +29,9 @@ World.prototype.setPlayer = function(id, data) {
 }
 
 World.prototype.createPlayer = function(id) {
-  this.setPlayer(id, {
-    x:             50,
-    y:             70,
-    movementDelay: 50,
-    stepSize:      5
-  })
+  var player = new Player(id)
+  this.setPlayer(id, player)
+  return player
 }
 
 World.prototype.updatePlayer = function(id, data) {

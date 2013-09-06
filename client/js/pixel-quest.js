@@ -11,16 +11,13 @@ window.PixelQuest = (function() {
       self.game.render()
 
       if (self.player && self.socket) {
-        self.socket.emit('player#update', self.player.toJSON())
+        self.socket.emit('player#update', self.player.object)
       }
     }, 10)
 
     // connect to the server and load the user's data
-    this.connectToServer(function(playerData) {
-      var id = playerData.id
-      delete playerData.id
-
-      self.player = new PixelQuest.Player(id, playerData)
+    this.connectToServer(function(player) {
+      self.player = new PixelQuest.Renderers.Player(player.id, player)
       self.game.addObject(self.player)
 
       var interaction = new PixelQuest.Interaction(self.player, self.socket)
@@ -29,11 +26,11 @@ window.PixelQuest = (function() {
   }
 
   PixelQuest.prototype.getPlayerId = function() {
-    var id = window.PixelQuest.Player.getIdentifier()
+    var id = window.PixelQuest.Utils.getIdentifier()
 
     if (!id) {
-      id = window.PixelQuest.Player.generateIdentifier()
-      window.PixelQuest.Player.setIdentifier(id)
+      id = window.PixelQuest.Utils.generateIdentifier()
+      window.PixelQuest.Utils.setIdentifier(id)
     }
 
     return id
@@ -41,20 +38,11 @@ window.PixelQuest = (function() {
 
   PixelQuest.prototype.connectToServer = function(callback) {
     var self    = this
-      , options = {}
 
-    if (document.location.href.indexOf('heroku') !== -1) {
-      options = {
-        "transports": ["xhr-polling"],
-        "polling duration": 10
-      }
-    }
-
-    this.socket = io.connect("http://" + document.location.host, options)
+    this.socket = io.connect("http://" + document.location.host)
 
     this.socket.on('world#sync', this.onWorldSync.bind(this))
     this.socket.on('monster#killed', function(monster) {
-      console.log('booya', monster.id, self.game.objects)
       self.game.removeObject(monster)
     })
 
@@ -63,21 +51,17 @@ window.PixelQuest = (function() {
   }
 
   PixelQuest.prototype.onWorldSync = function(type, data) {
-    var klass  = PixelQuest[type] || PixelQuest.Renderers[type]
+    var klass  = PixelQuest.Renderers[type]
       , self   = this
 
     data.forEach(function(objectData) {
-      var object = self.game.objects[objectData.id]
+      var object = self.game.getObject(objectData.id)
 
-      if (objectData.online || !(object instanceof window.PixelQuest.Player)) {
-        if (!!object) {
-          object.update(objectData)
-        } else {
-          object = new klass(objectData.id, objectData)
-          self.game.addObject(object)
-        }
-      } else if (!!object && !objectData.online) {
-        self.game.removeObject(object)
+      if (!!object) {
+        object.update(objectData)
+      } else {
+        object = new klass(objectData.id, objectData)
+        self.game.addObject(object)
       }
     })
 

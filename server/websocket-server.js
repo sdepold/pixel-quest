@@ -1,5 +1,7 @@
 var io    = require('socket.io')
   , World = require('./world.js')
+  , Player = require('./entities/player.js')
+  , Utils  = require('./utils')
 
 var WebSocket = module.exports = function(server) {
   this.server  = server
@@ -29,8 +31,10 @@ WebSocket.prototype.observeEvents = function(socket) {
 
   this.events = {
     'player#update': function(data) {
-      if (this.world.getPlayer(data.id)) {
-        this.world.setPlayer(data.id, data)
+      var player = this.world.getPlayer(data.id)
+
+      if (!!player) {
+        player.options = Utils.extend(player.options, data.options, ['x', 'y', 'attacking', 'renderOptions'])
       }
     },
 
@@ -48,17 +52,7 @@ WebSocket.prototype.observeEvents = function(socket) {
       socket.playerId       = data.id
       this.sockets[data.id] = socket
 
-      if (!this.world.getPlayer(data.id)) {
-        this.world.createPlayer(data.id)
-      }
-
-      this.world.updatePlayer(data.id, {
-        online:       true,
-        offlineSince: null,
-        id:           data.id
-      })
-
-      socket.emit('player#joined', this.world.getPlayer(data.id))
+      socket.emit('player#joined', this.world.getPlayer(data.id, { create: true }))
     },
 
     'player#attack': function(playerId) {
@@ -66,20 +60,23 @@ WebSocket.prototype.observeEvents = function(socket) {
 
       if (player) {
         this.world.findMonstersAtPosition({
-          y: player.y + ~~(player.renderOptions.height / 2),
+          y: player.options.y + ~~(player.options.renderOptions.height / 2),
           x: (
-            (player.renderOptions.weapon.direction === 'left') ? (
-              player.x - 7 * player.renderOptions.pixelSize
+            (player.options.renderOptions.weapon.direction === 'left') ? (
+              player.options.x - 7 * player.options.renderOptions.pixelSize
             ) : (
-              player.x + player.renderOptions.width + 7 * player.renderOptions.pixelSize
+              player.options.x + player.options.renderOptions.width + 7 * player.options.renderOptions.pixelSize
             )
           ),
-          delta: (player.renderOptions.weapon.direction === 'left') ? -20 : 20
+          delta: (player.options.renderOptions.weapon.direction === 'left') ? -20 : 20
         }).forEach(function(monster) {
-          monster.hit(player.strength, player.renderOptions.weapon.direction)
+          if (monster.alive()) {
+            monster.hit(player.options.strength, player.options.renderOptions.weapon.direction)
 
-          if (monster.options.hp === 0) {
-            socket.emit('monster#killed', monster)
+            if (!monster.alive()) {
+              socket.emit('player#killedMonster', player.killedMonster(monster))
+              socket.emit('monster#killed', monster)
+            }
           }
         })
       }

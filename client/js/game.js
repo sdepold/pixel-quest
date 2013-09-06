@@ -28,6 +28,10 @@ window.PixelQuest.Game = (function() {
     this.objects[object.id] = object
   }
 
+  Game.prototype.getObject = function(id) {
+    return this.objects[id]
+  }
+
   Game.prototype.removeObject = function(object) {
     delete this.objects[object.id]
   }

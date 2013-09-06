@@ -11,6 +11,7 @@ var Monster = module.exports = function() {
     id:         this.id,
     x:          Math.random() * 1000,
     y:          Math.random() * 1000,
+    difficulty: weight,
     height:     weight,
     width:      weight,
     color:      '#' + (Math.random().toString(16) + '000000').slice(2, 8),
@@ -31,7 +32,8 @@ var Monster = module.exports = function() {
       },
       face: {
         toothX: null
-      }
+      },
+      damages: []
     }
   }
 
@@ -55,6 +57,11 @@ Monster.prototype.iterate = function() {
     this.walk()
   }
 
+  this.options.renderOptions.damages = this.options.renderOptions.damages.filter(function(damage) {
+    damage.step = damage.step + 0.4
+    return damage.step < 10
+  })
+
   return this
 }
 
@@ -62,6 +69,13 @@ Monster.prototype.hit = function(strength, direction) {
   this.options.hp = Math.max.call(this, 0, this.options.hp - strength)
   this.options.attackedOptions.attacked = true
   this.options.attackedOptions.direction = direction
+
+  this.options.renderOptions.damages.push({
+    x: this.options.x + (Math.random() * this.options.width),
+    y: this.options.y,
+    damage: strength,
+    step: 0
+  })
 }
 
 Monster.prototype.alive = function() {
