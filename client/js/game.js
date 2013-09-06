@@ -7,7 +7,7 @@ window.PixelQuest.Game = (function() {
     this.objects = {}
   }
 
-  Game.prototype.render = function() {
+  Game.prototype.render = function(player) {
     var self = this
 
     this.setSize()
@@ -17,6 +17,8 @@ window.PixelQuest.Game = (function() {
     Object.keys(this.objects).forEach(function(objectId) {
       self.objects[objectId].render(self.ctx)
     })
+
+    renderInfoBar.call(this, player)
   }
 
   Game.prototype.setSize = function() {
@@ -34,6 +36,30 @@ window.PixelQuest.Game = (function() {
 
   Game.prototype.removeObject = function(object) {
     delete this.objects[object.id]
+  }
+
+  /////////////
+  // private //
+  /////////////
+
+  var renderInfoBar = function(player) {
+    var y = window.innerHeight - 40
+
+    this.ctx.fillStyle = '#2980b9'
+    this.ctx.fillRect(0, y, window.innerWidth, 40)
+
+    if (!!player) {
+      this.ctx.font = "bold 32px sans-serif"
+      this.ctx.fillStyle = "#FFE9DA"
+
+      var text = [
+        "Level: " + player.object.options.experience.level,
+        "HP: " + 10,
+        "XP: " + player.object.options.experience.current + "/" + player.object.options.experience.neededForLevelUp
+      ].join("      ")
+
+      this.ctx.fillText(text, 10, y + 32)
+    }
   }
 
   return Game

@@ -14,6 +14,7 @@ var Player = module.exports = function(id) {
     strength:      2,
     attacking:     false,
     experience: {
+      level: 1,
       current: 0,
       total: 0,
       neededForLevelUp: 400
@@ -80,6 +81,9 @@ var checkForLevelUp = function() {
 
     // increase speed
     this.options.stepSize = Math.min(this.options.stepSize + 1, 10)
+
+    // increate the level
+    this.options.experience.level++
 
     return this.options.renderOptions.levelUp.levelUp = true
   } else {

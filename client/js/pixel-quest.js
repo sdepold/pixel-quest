@@ -8,7 +8,7 @@ window.PixelQuest = (function() {
     var self = this
 
     this.renderIntervalId = setInterval(function() {
-      self.game.render()
+      self.game.render(self.player)
 
       if (self.player && self.socket) {
         self.socket.emit('player#update', self.player.object)
@@ -53,6 +53,14 @@ window.PixelQuest = (function() {
 
     this.socket.on('player#levelUp', function(player) {
       self.game.getObject(player.id).animateLevelUp()
+    })
+
+    this.socket.on('player#update', function(_player) {
+      var player = self.game.getObject(_player.id)
+
+      ;(['experience']).forEach(function(field) {
+        player.object.options[field] = _player.options[field]
+      })
     })
 
     this.socket.on('player#joined', callback)

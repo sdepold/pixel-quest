@@ -91,6 +91,8 @@ WebSocket.prototype.observeEvents = function(socket) {
               if (stats.levelUp) {
                 self.broadcast('player#levelUp', player)
               }
+
+              socket.emit('player#update', player)
             }
           }
         })
