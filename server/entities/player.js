@@ -1,7 +1,9 @@
 var utils = require('../utils.js')
 
 var Player = module.exports = function(id) {
-  this.id      = id
+  this.id        = id
+  this.className = 'Player'
+
   this.options = {
     x:             50,
     y:             70,
@@ -32,7 +34,8 @@ var Player = module.exports = function(id) {
         side: 'right',
         direction: 'up',
         angle: 0
-      }
+      },
+      experience: []
     }
   }
 }

@@ -34,17 +34,20 @@ WebSocket.prototype.observeEvents = function(socket) {
       var player = this.world.getPlayer(data.id)
 
       if (!!player) {
+        delete data.options.renderOptions.experience
         player.options = Utils.extend(player.options, data.options, ['x', 'y', 'attacking', 'renderOptions'])
       }
     },
 
     'disconnect': function() {
       // console.log('Player', socket.playerId, 'just quit the game.')
-      if (this.world.getPlayer(socket.playerId)) {
-        this.world.updatePlayer(socket.playerId, {
-          online:       false,
-          offlineSince: +new Date()
-        })
+      var player = this.world.getPlayer(socket.playerId)
+
+      if (!!player) {
+        // player.options = Utils.extend(player.options, {
+        //   online:       false,
+        //   offlineSince: +new Date()
+        // })
       }
     },
 
@@ -52,7 +55,14 @@ WebSocket.prototype.observeEvents = function(socket) {
       socket.playerId       = data.id
       this.sockets[data.id] = socket
 
-      socket.emit('player#joined', this.world.getPlayer(data.id, { create: true }))
+      var player = this.world.getPlayer(data.id, { create: true })
+
+      player.options = Utils.extend(player.options, {
+        online:       true,
+        offlineSince: null
+      })
+
+      socket.emit('player#joined', player)
     },
 
     'player#attack': function(playerId) {
@@ -62,11 +72,9 @@ WebSocket.prototype.observeEvents = function(socket) {
         this.world.findMonstersAtPosition({
           y: player.options.y + ~~(player.options.renderOptions.height / 2),
           x: (
-            (player.options.renderOptions.weapon.direction === 'left') ? (
-              player.options.x - 7 * player.options.renderOptions.pixelSize
-            ) : (
-              player.options.x + player.options.renderOptions.width + 7 * player.options.renderOptions.pixelSize
-            )
+            (player.options.renderOptions.weapon.direction === 'left')
+            ? (player.options.x - 7 * player.options.renderOptions.pixelSize)
+            : (player.options.x + player.options.renderOptions.width + 7 * player.options.renderOptions.pixelSize)
           ),
           delta: (player.options.renderOptions.weapon.direction === 'left') ? -20 : 20
         }).forEach(function(monster) {
@@ -74,8 +82,10 @@ WebSocket.prototype.observeEvents = function(socket) {
             monster.hit(player.options.strength, player.options.renderOptions.weapon.direction)
 
             if (!monster.alive()) {
-              socket.emit('player#killedMonster', player.killedMonster(monster))
-              socket.emit('monster#killed', monster)
+              var stats = player.killedMonster(monster)
+
+              self.broadcast('monster#killed', monster)
+              self.broadcast('player#experience', player, stats.experience)
             }
           }
         })
@@ -88,6 +98,16 @@ WebSocket.prototype.observeEvents = function(socket) {
       // console.log('Received event', eventName, 'with the following arguments', arguments)
       self.events[eventName].apply(self, arguments)
     })
+  })
+}
+
+WebSocket.prototype.broadcast = function() {
+  var args = [].slice.call(arguments)
+    , self = this
+
+  Object.keys(this.sockets).forEach(function(playerIdOfSocket) {
+    var socket = self.sockets[playerIdOfSocket]
+    socket.emit.apply(socket, args)
   })
 }
 

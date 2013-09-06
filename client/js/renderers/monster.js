@@ -103,7 +103,7 @@ window.PixelQuest.Renderers.Monster = (function() {
       var opacity = 1 - damage.step / 10
 
       ctx.fillStyle = 'rgba(200, 0, 0, ' + opacity + ')'
-      ctx.fillText(damage.damage, damage.x, damage.y - damage.step);
+      ctx.fillText(damage.damage, damage.x, damage.y - damage.step)
     })
   }
 

@@ -9,7 +9,7 @@ module.exports = {
 
     Object.keys(extension).forEach(function(key) {
       if (!filter || (filter.indexOf(key) !== -1)) {
-        if (extension[key] === Object(extension[key])) {
+        if ((extension[key] === Object(extension[key])) && !Array.isArray(extension[key])) {
           result[key] = self.extend(result[key], extension[key])
         } else {
           result[key] = extension[key]

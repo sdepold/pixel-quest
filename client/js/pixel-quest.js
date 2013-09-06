@@ -42,8 +42,13 @@ window.PixelQuest = (function() {
     this.socket = io.connect("http://" + document.location.host)
 
     this.socket.on('world#sync', this.onWorldSync.bind(this))
+
     this.socket.on('monster#killed', function(monster) {
       self.game.removeObject(monster)
+    })
+
+    this.socket.on('player#experience', function(player, exp) {
+      self.game.getObject(player.id).animateExperience(exp)
     })
 
     this.socket.on('player#joined', callback)

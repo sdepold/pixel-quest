@@ -86,7 +86,7 @@ World.prototype.getSyncData = function(playerIdOfSocket) {
   var players = Object.keys(this.players).map(function(playerId) {
     var player = self.getPlayer(playerId)
 
-    if ((player.id != playerIdOfSocket) && player.online) {
+    if ((player.id != playerIdOfSocket) && player.options.online) {
       return player
     }
   }).filter(function(player) {

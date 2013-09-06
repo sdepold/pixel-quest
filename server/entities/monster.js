@@ -6,7 +6,9 @@ var Monster = module.exports = function() {
 
   var hp = (Math.pow(weight,2) / Math.pow(60,2)) * 100
 
-  this.id      = utils.generateIdentifier()
+  this.id        = utils.generateIdentifier()
+  this.className = 'Monster'
+
   this.options = {
     id:         this.id,
     x:          Math.random() * 1000,

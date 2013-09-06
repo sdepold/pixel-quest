@@ -7,12 +7,26 @@ window.PixelQuest.Renderers.Player = (function() {
     this.object       = player
   }
 
+  Player.prototype.animateExperience = function(exp) {
+    this.object.options.renderOptions.experience.push({
+      value: exp,
+      step:  0,
+      x:     this.object.options.x + (Math.random() * this.object.options.renderOptions.width),
+      y:     this.object.options.y
+    })
+  }
+
+  Player.prototype.update = function(player) {
+    this.object = player
+  }
+
   Player.prototype.render = function(ctx) {
     renderBody.call(this, ctx)
     renderArms.call(this,ctx)
     renderWeapon.call(this, ctx)
     renderHair.call(this, ctx)
     renderFeet.call(this, ctx)
+    renderExperience.call(this, ctx)
   }
 
   Player.prototype.move = function(direction, step) {
@@ -171,6 +185,24 @@ window.PixelQuest.Renderers.Player = (function() {
         this.object.options.attacking = false
       }
     }
+  }
+
+
+  var renderExperience = function(ctx) {
+    var self = this
+
+    ctx.font = "bold 12px sans-serif"
+
+    this.object.options.renderOptions.experience = this.object.options.renderOptions.experience.filter(function(experience) {
+      experience.step = experience.step + 0.4
+
+      var opacity = 1 - experience.step / 10
+
+      ctx.fillStyle = 'rgba(39, 139, 210, ' + opacity + ')'
+      ctx.fillText(experience.value, experience.x, experience.y - experience.step)
+
+      return experience.step < 10
+    })
   }
 
   return Player
