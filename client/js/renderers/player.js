@@ -2,9 +2,15 @@ window.PixelQuest.Renderers.Player = (function() {
   "use strict"
 
   var Player = function(id, player) {
-    this.id           = id
-    this.activePlayer = (id === window.PixelQuest.Utils.getIdentifier())
-    this.object       = player
+    this.id            = id
+    this.activePlayer  = (id === window.PixelQuest.Utils.getIdentifier())
+    this.object        = player
+    this.renderOptions = {
+      levelUp: {
+        levelUp: false,
+        step:    0
+      }
+    }
   }
 
   Player.prototype.animateExperience = function(exp) {
@@ -16,11 +22,17 @@ window.PixelQuest.Renderers.Player = (function() {
     })
   }
 
+  Player.prototype.animateLevelUp = function() {
+    this.renderOptions.levelUp.levelUp = true
+    this.renderOptions.levelUp.step = 0
+  }
+
   Player.prototype.update = function(player) {
     this.object = player
   }
 
   Player.prototype.render = function(ctx) {
+    renderLevelUp.call(this, ctx)
     renderBody.call(this, ctx)
     renderArms.call(this,ctx)
     renderWeapon.call(this, ctx)
@@ -194,7 +206,7 @@ window.PixelQuest.Renderers.Player = (function() {
     ctx.font = "bold 12px sans-serif"
 
     this.object.options.renderOptions.experience = this.object.options.renderOptions.experience.filter(function(experience) {
-      experience.step = experience.step + 0.4
+      experience.step = experience.step + 0.3
 
       var opacity = 1 - experience.step / 10
 
@@ -203,6 +215,29 @@ window.PixelQuest.Renderers.Player = (function() {
 
       return experience.step < 10
     })
+  }
+
+  var renderLevelUp = function(ctx) {
+    if (this.renderOptions.levelUp.levelUp) {
+      this.renderOptions.levelUp.step = this.renderOptions.levelUp.step + 0.1
+
+      var px = this.object.options.renderOptions.pixelSize
+        , x  = this.object.options.x + ~~(this.object.options.renderOptions.width / 2)
+        , y  = this.object.options.y - 0 * px
+
+      y = y - this.renderOptions.levelUp.step * px
+
+      ctx.fillStyle = this.object.options.renderOptions.colors.outline
+      ctx.fillRect(x, y, px * 2, px * 2)
+      ctx.fillRect(x, y, px * -2, px * 2)
+      ctx.fillRect(x - px, y + px, px * 2, px * 2)
+      ctx.fillRect(x - px, y + px, px * 2, px * -2)
+
+      if (this.renderOptions.levelUp.step > 10) {
+        this.renderOptions.levelUp.levelUp = false
+        this.renderOptions.levelUp.step = 0
+      }
+    }
   }
 
   return Player

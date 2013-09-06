@@ -35,7 +35,11 @@ var Player = module.exports = function(id) {
         direction: 'up',
         angle: 0
       },
-      experience: []
+      experience: [],
+      levelUp: {
+        levelUp: false,
+        step:    0
+      }
     }
   }
 }
@@ -77,7 +81,7 @@ var checkForLevelUp = function() {
     // increase speed
     this.options.stepSize = Math.min(this.options.stepSize + 1, 10)
 
-    return true
+    return this.options.renderOptions.levelUp.levelUp = true
   } else {
     return false
   }

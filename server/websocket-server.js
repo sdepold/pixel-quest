@@ -35,6 +35,7 @@ WebSocket.prototype.observeEvents = function(socket) {
 
       if (!!player) {
         delete data.options.renderOptions.experience
+        delete data.options.renderOptions.levelUp
         player.options = Utils.extend(player.options, data.options, ['x', 'y', 'attacking', 'renderOptions'])
       }
     },
@@ -86,6 +87,10 @@ WebSocket.prototype.observeEvents = function(socket) {
 
               self.broadcast('monster#killed', monster)
               self.broadcast('player#experience', player, stats.experience)
+
+              if (stats.levelUp) {
+                self.broadcast('player#levelUp', player)
+              }
             }
           }
         })

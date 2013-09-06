@@ -51,6 +51,10 @@ window.PixelQuest = (function() {
       self.game.getObject(player.id).animateExperience(exp)
     })
 
+    this.socket.on('player#levelUp', function(player) {
+      self.game.getObject(player.id).animateLevelUp()
+    })
+
     this.socket.on('player#joined', callback)
     this.socket.emit('player#join', { id: this.getPlayerId() })
   }

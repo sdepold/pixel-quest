@@ -60,7 +60,7 @@ Monster.prototype.iterate = function() {
   }
 
   this.options.renderOptions.damages = this.options.renderOptions.damages.filter(function(damage) {
-    damage.step = damage.step + 0.4
+    damage.step = damage.step + 0.3
     return damage.step < 10
   })
 
