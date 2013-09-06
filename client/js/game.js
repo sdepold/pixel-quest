@@ -51,6 +51,7 @@ window.PixelQuest.Game = (function() {
     if (!!player) {
       this.ctx.font = "bold 32px sans-serif"
       this.ctx.fillStyle = "#FFE9DA"
+      this.ctx.textAlign = 'left'
 
       var text = [
         "Level: " + player.object.options.experience.level,
@@ -59,6 +60,20 @@ window.PixelQuest.Game = (function() {
       ].join("      ")
 
       this.ctx.fillText(text, 10, y + 32)
+
+      this.ctx.textAlign = 'right'
+      this.ctx.fillText(
+        [
+          "Kill",
+          player.object.options.achievements.current.needed - player.object.options.achievements.current.achieved,
+          player.object.options.achievements.current.colorName,
+          'monsters.'
+        ].join(" "),
+        window.innerWidth - 10,
+        y + 32
+      )
+
+      this.ctx.textAlign = 'left'
     }
   }
 

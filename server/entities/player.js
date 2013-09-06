@@ -1,8 +1,11 @@
-var utils = require('../utils.js')
+var utils   = require('../utils.js')
+  , Monster = require('./monster')
 
 var Player = module.exports = function(id) {
   this.id        = id
   this.className = 'Player'
+
+  var color = Monster.getRandomColor()
 
   this.options = {
     x:             50,
@@ -18,6 +21,15 @@ var Player = module.exports = function(id) {
       current: 0,
       total: 0,
       neededForLevelUp: 400
+    },
+    achievements: {
+      current: {
+        color:     color,
+        colorName: Monster.COLORS[color],
+        achieved:  0,
+        needed:    ~~(Math.random() * 10)
+      },
+      done: []
     },
     renderOptions: {
       colors: {
@@ -61,6 +73,8 @@ Player.prototype.killedMonster = function(monster) {
   this.options.experience.current = this.options.experience.current + experience
   this.options.experience.total   = this.options.experience.total + experience
 
+  checkForAchiements.call(this, monster)
+
   return {
     experience: experience,
     levelUp:    checkForLevelUp.call(this)
@@ -88,5 +102,11 @@ var checkForLevelUp = function() {
     return this.options.renderOptions.levelUp.levelUp = true
   } else {
     return false
+  }
+}
+
+var checkForAchiements = function(monster) {
+  if (monster.options.color === '#' + this.options.achievements.current.color) {
+    this.options.achievements.current.achieved++
   }
 }

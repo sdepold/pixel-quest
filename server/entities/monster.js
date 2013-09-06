@@ -16,7 +16,7 @@ var Monster = module.exports = function() {
     difficulty: weight,
     height:     weight,
     width:      weight,
-    color:      '#' + (Math.random().toString(16) + '000000').slice(2, 8),
+    color:      '#' + Monster.getRandomColor(),
     target:     null,
     walkSpeed:  (Math.pow(60,2) / Math.pow(weight,2)) * 10,
     hp:         hp,
@@ -41,6 +41,22 @@ var Monster = module.exports = function() {
 
   var toothX = ~~(Math.random() * (this.options.width - 5 * this.options.renderOptions.pixelSize))
   this.options.renderOptions.face.toothX = toothX
+}
+
+Monster.COLORS = {
+  '1abc9c': 'turquoise',
+  'f39c12': 'orange',
+  '2ecc71': 'green',
+  'd35400': 'red',
+  '3498db': 'blue',
+  '9b59b6': 'purple',
+  'bdc3c7': 'silver',
+  '2c3e50': 'grey'
+}
+
+Monster.getRandomColor = function() {
+  var codes = Object.keys(Monster.COLORS)
+  return codes[~~(Math.random() * (codes.length - 1))]
 }
 
 Monster.prototype.iterate = function() {
