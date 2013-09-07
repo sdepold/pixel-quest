@@ -205,15 +205,22 @@ window.PixelQuest.Renderers.Player = (function() {
 
     ctx.font = "bold 12px sans-serif"
 
-    this.object.options.renderOptions.experience = this.object.options.renderOptions.experience.filter(function(experience) {
-      experience.step = experience.step + 0.3
+    this.object.options.renderOptions.experience = this.object.options.renderOptions.experience.sort(function(a, b) {
+      return a.value - b.value
+    }).filter(function(experience, i) {
+      if (i === 0) {
+        experience.step = experience.step + 0.2
 
-      var opacity = 1 - experience.step / 10
+        var opacity = 1 - experience.step / 10
 
-      ctx.fillStyle = 'rgba(39, 139, 210, ' + opacity + ')'
-      ctx.fillText(experience.value, experience.x, experience.y - experience.step)
+        ctx.fillStyle = 'rgba(39, 139, 210, ' + opacity + ')'
+        ctx.fillText(experience.value, experience.x, experience.y - experience.step)
 
-      return experience.step < 10
+        return experience.step < 10
+      } else {
+        // only animate one experience thingy at once
+        return true
+      }
     })
   }
 

@@ -88,6 +88,10 @@ WebSocket.prototype.observeEvents = function(socket) {
               self.broadcast('monster#killed', monster)
               self.broadcast('player#experience', player, stats.experience)
 
+              if (stats.achievement.done) {
+                self.broadcast('player#experience', player, stats.achievement.experience)
+              }
+
               if (stats.levelUp) {
                 self.broadcast('player#levelUp', player)
               }

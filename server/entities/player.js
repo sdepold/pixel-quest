@@ -5,8 +5,6 @@ var Player = module.exports = function(id) {
   this.id        = id
   this.className = 'Player'
 
-  var color = Monster.getRandomColor()
-
   this.options = {
     x:             50,
     y:             70,
@@ -23,12 +21,7 @@ var Player = module.exports = function(id) {
       neededForLevelUp: 400
     },
     achievements: {
-      current: {
-        color:     color,
-        colorName: Monster.COLORS[color],
-        achieved:  0,
-        needed:    ~~(Math.random() * 10)
-      },
+      current: generateAchievement(),
       done: []
     },
     renderOptions: {
@@ -68,22 +61,23 @@ Player.prototype.update = function(data) {
 }
 
 Player.prototype.killedMonster = function(monster) {
-  var experience = monster.options.difficulty * 20
-
-  this.options.experience.current = this.options.experience.current + experience
-  this.options.experience.total   = this.options.experience.total + experience
-
-  checkForAchiements.call(this, monster)
-
   return {
-    experience: experience,
-    levelUp:    checkForLevelUp.call(this)
+    experience: increaseExperience.call(this, monster.options.difficulty * 20),
+    levelUp: checkForLevelUp.call(this),
+    achievement: checkForAchiements.call(this, monster)
   }
 }
 
 /////////////
 // private //
 /////////////
+
+var increaseExperience = function(experience) {
+  this.options.experience.current = this.options.experience.current + experience
+  this.options.experience.total   = this.options.experience.total + experience
+
+  return experience
+}
 
 var checkForLevelUp = function() {
   if (this.options.experience.current >= this.options.experience.neededForLevelUp) {
@@ -108,5 +102,36 @@ var checkForLevelUp = function() {
 var checkForAchiements = function(monster) {
   if (monster.options.color === '#' + this.options.achievements.current.color) {
     this.options.achievements.current.achieved++
+  }
+
+  if (this.options.achievements.current.achieved === this.options.achievements.current.needed) {
+    var result = {
+      done: true,
+      experience: this.options.achievements.current.experience
+    }
+
+    increaseExperience.call(this, result.experience)
+
+    this.options.achievements.done.push(this.options.achievements.current)
+    this.options.achievements.current = generateAchievement()
+
+    return result
+  } else {
+    return {
+      done: false
+    }
+  }
+}
+
+var generateAchievement = function() {
+  var needed = 1 //+ ~~(Math.random() * 10)
+    , color  = Monster.getRandomColor()
+
+  return {
+    color:      color,
+    colorName:  Monster.COLORS[color],
+    achieved:   0,
+    needed:     needed,
+    experience: needed * ~~(Math.random() * 50)
   }
 }
