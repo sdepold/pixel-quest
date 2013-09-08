@@ -43,13 +43,14 @@ window.PixelQuest.Game = (function() {
   /////////////
 
   var renderInfoBar = function(player) {
-    var y = window.innerHeight - 40
+    var y     = window.innerHeight - 40
+      , textY = y + 28
 
     this.ctx.fillStyle = '#2980b9'
     this.ctx.fillRect(0, y, window.innerWidth, 40)
 
     if (!!player) {
-      this.ctx.font = "bold 32px sans-serif"
+      this.ctx.font = "bold 22px sans-serif"
       this.ctx.fillStyle = "#FFE9DA"
       this.ctx.textAlign = 'left'
 
@@ -59,7 +60,7 @@ window.PixelQuest.Game = (function() {
         "XP: " + player.object.options.experience.current + "/" + player.object.options.experience.neededForLevelUp
       ].join("      ")
 
-      this.ctx.fillText(text, 10, y + 32)
+      this.ctx.fillText(text, 10, textY)
 
       this.ctx.textAlign = 'right'
       this.ctx.fillText(
@@ -70,7 +71,7 @@ window.PixelQuest.Game = (function() {
           'monsters.'
         ].join(" "),
         window.innerWidth - 10,
-        y + 32
+        textY
       )
 
       this.ctx.textAlign = 'left'

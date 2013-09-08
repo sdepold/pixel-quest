@@ -89,7 +89,7 @@ Monster.prototype.hit = function(strength, direction) {
   this.options.attackedOptions.direction = direction
 
   this.options.renderOptions.damages.push({
-    x: this.options.x + (Math.random() * this.options.width),
+    x: this.options.x + 20 + (Math.random() * this.options.width),
     y: this.options.y,
     damage: strength,
     step: 0

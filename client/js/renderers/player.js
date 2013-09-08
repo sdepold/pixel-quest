@@ -14,11 +14,13 @@ window.PixelQuest.Renderers.Player = (function() {
   }
 
   Player.prototype.animateExperience = function(exp) {
+    var px = this.object.options.renderOptions.pixelSize
+
     this.object.options.renderOptions.experience.push({
       value: exp,
       step:  0,
       x:     this.object.options.x + (Math.random() * this.object.options.renderOptions.width),
-      y:     this.object.options.y
+      y:     this.object.options.y - 2 * px
     })
   }
 
@@ -214,9 +216,18 @@ window.PixelQuest.Renderers.Player = (function() {
         var opacity = 1 - experience.step / 10
 
         ctx.fillStyle = 'rgba(39, 139, 210, ' + opacity + ')'
-        ctx.fillText(experience.value, experience.x, experience.y - experience.step)
+        ctx.fillText("+" + experience.value, experience.x, experience.y - experience.step)
 
-        return experience.step < 10
+        if (experience.step < 10) {
+          return true
+        } else {
+          if (self.object.options.renderOptions.experience.length > 1) {
+            self.object.options.renderOptions.experience[1].x = self.object.options.x + (Math.random() * self.object.options.renderOptions.width)
+            self.object.options.renderOptions.experience[1].y = self.object.options.y
+          }
+
+          return false
+        }
       } else {
         // only animate one experience thingy at once
         return true
