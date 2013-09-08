@@ -124,7 +124,7 @@ var checkForAchiements = function(monster) {
 }
 
 var generateAchievement = function() {
-  var needed = 1 //+ ~~(Math.random() * 10)
+  var needed = 1 + ~~(Math.random() * 10)
     , color  = Monster.getRandomColor()
 
   return {
