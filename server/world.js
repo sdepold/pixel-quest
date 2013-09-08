@@ -14,7 +14,7 @@ var World = module.exports = function() {
   // generateEnvironment.call(this)
 
   setInterval(function() {
-    if (self.getMonsters({ alive: true }).length < 1) {
+    if (self.getMonsters({ alive: true }).length < 10) {
       self.spawnMonsters()
     }
   }, 1000)
