@@ -15,9 +15,6 @@ window.PixelQuest.Game = (function() {
     this.ctx.fillStyle = "#FFE9DA"
     this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
-    Object.keys(this.objects).forEach(function(objectId) {
-      self.objects[objectId].render(self.ctx)
-    })
 
     renderSky.call(this, 240)
     renderMountains.call(this, 240, "#ffffff", 10)
@@ -26,6 +23,10 @@ window.PixelQuest.Game = (function() {
     renderMountains.call(this, 240, "#FFE9DA", 3)
     renderSun.call(this)
     renderInfoBar.call(this, player)
+
+    Object.keys(this.objects).forEach(function(objectId) {
+      self.objects[objectId].render(self.ctx)
+    })
   }
 
   Game.prototype.setSize = function() {

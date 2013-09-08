@@ -56,7 +56,7 @@ window.PixelQuest.Renderers.Player = (function() {
         this.object.options.renderOptions.weapon.side = 'right'
         break
       case 'up':
-        this.object.options.y = this.object.options.y - step
+        this.object.options.y = Math.max(230, this.object.options.y - step)
         break
       case 'down':
         this.object.options.y = this.object.options.y + step

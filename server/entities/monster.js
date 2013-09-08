@@ -12,7 +12,7 @@ var Monster = module.exports = function() {
   this.options = {
     id:         this.id,
     x:          Math.random() * 1000,
-    y:          Math.random() * 1000,
+    y:          220 + Math.random() * 600,
     difficulty: weight,
     height:     weight,
     width:      weight,
@@ -107,7 +107,7 @@ Monster.prototype.getTarget = function() {
   } else {
     this.options.target = {
       x:      Math.random() * 1000,
-      y:      Math.random() * 1000,
+      y:      220 + Math.random() * 600,
       startX: this.options.x,
       startY: this.options.y
     }

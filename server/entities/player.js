@@ -6,8 +6,8 @@ var Player = module.exports = function(id) {
   this.className = 'Player'
 
   this.options = {
-    x:             50,
-    y:             70,
+    x:             40,
+    y:             280,
     movementDelay: 50,
     stepSize:      5,
     online:        true,
@@ -26,7 +26,7 @@ var Player = module.exports = function(id) {
     },
     renderOptions: {
       colors: {
-        outline: "#F2D5C0",
+        outline: "#2c3e50",
         face:    "#FFFFFF"
       },
       width: 21,
