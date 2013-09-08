@@ -11,10 +11,10 @@ var World = module.exports = function() {
     houses: []
   }
 
-  generateEnvironment.call(this)
+  // generateEnvironment.call(this)
 
   setInterval(function() {
-    if (self.getMonsters({ alive: true }).length < 10) {
+    if (self.getMonsters({ alive: true }).length < 1) {
       self.spawnMonsters()
     }
   }, 1000)
@@ -72,13 +72,40 @@ World.prototype.getMonsters = function(options) {
   })
 }
 
-World.prototype.findMonstersAtPosition = function(options) {
-  return this.getMonsters().filter(function(monster) {
-    return (monster.options.x < options.x) &&
-           ((monster.options.x + monster.options.width) > options.x) &&
-           (monster.options.y < options.y) &&
-           ((monster.options.y + monster.options.height + monster.options.renderOptions.pixelSize * 3) > options.y)
-  })
+World.prototype.findAttackableMonsters = function(player) {
+  var maxRange = 30
+
+  if (player.options.renderOptions.weapon.side === 'left') {
+    return this.getMonsters().filter(function(monster) {
+      var rightX = monster.options.x + monster.options.width + monster.options.renderOptions.pixelSize * 2
+
+      return (
+        // is left of player
+        (rightX < player.options.x) &&
+
+        // is close to player
+        ((player.options.x - rightX) < maxRange) &&
+
+        // player is on the same height as the monster
+        (monster.options.y < player.options.y) && (monster.options.y + monster.options.height > player.options.y)
+      )
+    })
+  } else {
+    return this.getMonsters().filter(function(monster) {
+      var rightX = player.options.x + player.options.renderOptions.width + player.options.renderOptions.pixelSize * 3
+
+      return (
+        // is right of player
+        (monster.options.x > rightX) &&
+
+        // is close to player
+        ((monster.options.x - rightX) < maxRange) &&
+
+        // player is on the same height as the monster
+        (monster.options.y < player.options.y) && (monster.options.y + monster.options.height > player.options.y)
+      )
+    })
+  }
 }
 
 World.prototype.spawnMonsters = function() {

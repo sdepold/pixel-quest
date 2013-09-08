@@ -70,17 +70,9 @@ WebSocket.prototype.observeEvents = function(socket) {
       var player = this.world.getPlayer(playerId)
 
       if (player) {
-        this.world.findMonstersAtPosition({
-          y: player.options.y + ~~(player.options.renderOptions.height / 2),
-          x: (
-            (player.options.renderOptions.weapon.direction === 'left')
-            ? (player.options.x - 7 * player.options.renderOptions.pixelSize)
-            : (player.options.x + player.options.renderOptions.width + 7 * player.options.renderOptions.pixelSize)
-          ),
-          delta: (player.options.renderOptions.weapon.direction === 'left') ? -20 : 20
-        }).forEach(function(monster) {
+        this.world.findAttackableMonsters(player).forEach(function(monster) {
           if (monster.alive()) {
-            monster.hit(player.options.strength, player.options.renderOptions.weapon.direction)
+            monster.hit(player.options.strength, player.options.renderOptions.weapon.side)
 
             if (!monster.alive()) {
               var stats = player.killedMonster(monster)

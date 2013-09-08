@@ -63,8 +63,9 @@ Monster.prototype.iterate = function() {
   if (this.options.attackedOptions.attacked) {
     if (this.options.attackedOptions.diff < 31) {
       var distance = 5
-      this.options.x = this.options.x + ((this.options.attackedOptions.direction === 'left' ? -1 : 1) * 5)
-      this.options.attackedOptions.diff = this.options.attackedOptions.diff + 5
+
+      this.options.x = this.options.x + ((this.options.attackedOptions.direction === 'left' ? -1 : 1) * distance)
+      this.options.attackedOptions.diff = this.options.attackedOptions.diff + distance
     } else {
       this.options.attackedOptions.attacked = false
       this.options.attackedOptions.diff = 0
