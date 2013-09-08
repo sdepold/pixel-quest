@@ -5,7 +5,7 @@ window.PixelQuest.Game = (function() {
     this.canvas      = document.querySelector("canvas")
     this.ctx         = this.canvas.getContext('2d')
     this.objects     = {}
-    this.environment = { sky: {} }
+    this.environment = { sky: {}, sun: { offset: 0, direction: "decr" } }
   }
 
   Game.prototype.render = function(player) {
@@ -22,11 +22,12 @@ window.PixelQuest.Game = (function() {
     renderMountains.call(this, 240, "#d8c6b8", 6)
     renderMountains.call(this, 240, "#FFE9DA", 3)
     renderSun.call(this)
-    renderInfoBar.call(this, player)
 
     Object.keys(this.objects).forEach(function(objectId) {
       self.objects[objectId].render(self.ctx)
     })
+
+    renderInfoBar.call(this, player)
   }
 
   Game.prototype.setSize = function() {
@@ -122,8 +123,25 @@ window.PixelQuest.Game = (function() {
   var renderSun = function() {
     var px = 12
 
+    if (this.environment.sun.offset > px) {
+      this.environment.sun.direction = 'decr'
+    } else if (this.environment.sun.offset < -px) {
+      this.environment.sun.direction = 'incr'
+    }
+
+    if (this.environment.sun.direction === 'decr') {
+      this.environment.sun.offset = this.environment.sun.offset - 0.05
+    } else {
+      this.environment.sun.offset = this.environment.sun.offset + 0.05
+    }
+
     this.ctx.fillStyle = '#f1c40f'
-    this.ctx.fillRect(px * 3, px * 3, px * 6, px * 6)
+    this.ctx.fillRect(
+      px * 3 - this.environment.sun.offset / 2,
+      px * 3 - this.environment.sun.offset / 2,
+      px * 6 + this.environment.sun.offset,
+      px * 6 + this.environment.sun.offset
+    )
   }
 
   return Game
