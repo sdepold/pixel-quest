@@ -76,33 +76,37 @@ World.prototype.findAttackableMonsters = function(player) {
   var maxRange = 30
 
   if (player.options.renderOptions.weapon.side === 'left') {
+    // the player walks to the left
     return this.getMonsters().filter(function(monster) {
       var rightX = monster.options.x + monster.options.width + monster.options.renderOptions.pixelSize * 2
 
       return (
-        // is left of player
-        (rightX < player.options.x) &&
+        // left side of the player is on the right of monster
+        ((player.options.x - maxRange) < (monster.options.x + maxRange)) &&
 
-        // is close to player
-        ((player.options.x - rightX) < maxRange) &&
+        // right side of the player is on the right of the monster
+        (rightX < (player.options.x + player.options.renderOptions.width)) &&
 
         // player is on the same height as the monster
-        (monster.options.y < player.options.y) && (monster.options.y + monster.options.height > player.options.y)
+        (monster.options.y < player.options.y) &&
+        (monster.options.y + monster.options.height > player.options.y)
       )
     })
   } else {
+    // the player walks to the right
     return this.getMonsters().filter(function(monster) {
       var rightX = player.options.x + player.options.renderOptions.width + player.options.renderOptions.pixelSize * 3
 
       return (
-        // is right of player
-        (monster.options.x > rightX) &&
+        // left side of the monster is on the right of player
+        ((monster.options.x - maxRange) < (player.options.x + maxRange)) &&
 
-        // is close to player
-        ((monster.options.x - rightX) < maxRange) &&
+        // right side of the monster is on the right of the player
+        (rightX < (monster.options.x + monster.options.width)) &&
 
         // player is on the same height as the monster
-        (monster.options.y < player.options.y) && (monster.options.y + monster.options.height > player.options.y)
+        (monster.options.y < player.options.y) &&
+        (monster.options.y + monster.options.height > player.options.y)
       )
     })
   }
