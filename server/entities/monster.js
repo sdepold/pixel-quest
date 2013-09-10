@@ -155,3 +155,21 @@ Monster.prototype.animateFeet = function() {
 
   return this
 }
+
+Monster.prototype.inAttackRange = function(player) {
+  var playerTop     = player.options.y
+    , playerBottom  = playerTop + player.options.renderOptions.height
+    , playerLeft    = player.options.x
+    , playerRight   = playerLeft + player.options.renderOptions.width
+    , monsterTop    = this.options.y
+    , monsterBottom = monsterTop + this.options.height
+    , monsterLeft   = this.options.x
+    , monsterRight  = monsterLeft + this.options.width
+
+  return (
+    (playerRight > monsterLeft) &&
+    (playerLeft < monsterRight) &&
+    (playerBottom > monsterTop) &&
+    (playerTop < monsterBottom)
+  )
+}

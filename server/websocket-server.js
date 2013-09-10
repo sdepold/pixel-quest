@@ -119,8 +119,15 @@ WebSocket.prototype.syncWorld = function() {
   var self = this
 
   Object.keys(this.sockets).forEach(function(playerIdOfSocket) {
-    var socket = self.sockets[playerIdOfSocket]
+    var player = self.world.getPlayer(playerIdOfSocket)
+      , socket = self.sockets[playerIdOfSocket]
       , data   = self.world.getSyncData(playerIdOfSocket)
+
+    if (player.checkForAttacks(data.Monster)) {
+      // the player has been hit and needs an update
+      socket.emit('player#update', player)
+    }
+
 
     // console.log('Emitting world#sync with the following arguments', players)
 

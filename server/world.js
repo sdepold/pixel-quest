@@ -117,21 +117,23 @@ World.prototype.spawnMonsters = function() {
   this.monsters[monster.id] = monster
 }
 
-World.prototype.getSyncData = function(playerIdOfSocket) {
+World.prototype.getOtherPlayers = function(id) {
   var self = this
 
-  var players = Object.keys(this.players).map(function(playerId) {
+  return Object.keys(this.players).map(function(playerId) {
     var player = self.getPlayer(playerId)
 
-    if ((player.id != playerIdOfSocket) && player.options.online) {
+    if ((player.id != id) && player.options.online) {
       return player
     }
   }).filter(function(player) {
     return !!player
   })
+}
 
+World.prototype.getSyncData = function(playerIdOfSocket) {
   return {
-    Player:  players,
+    Player:  this.getOtherPlayers(playerIdOfSocket),
     Monster: this.getMonsters({ alive: true }),
     House:   this.environment.houses
   }

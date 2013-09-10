@@ -14,6 +14,8 @@ var Player = module.exports = function(id) {
     offlineSince:  null,
     strength:      2,
     attacking:     false,
+    originalHp:    20,
+    hp:            20,
     experience: {
       level: 1,
       current: 0,
@@ -68,6 +70,29 @@ Player.prototype.killedMonster = function(monster) {
   }
 }
 
+Player.prototype.checkForAttacks = function(monsters) {
+  var self       = this
+    , hasBeenHit = false
+
+  monsters.forEach(function(monster) {
+    if (!hasBeenHit && monster.inAttackRange(self)) {
+      hasBeenHit = true
+      self.hit(monster)
+    }
+  })
+
+  return hasBeenHit
+}
+
+Player.prototype.hit = function(monster) {
+  var xDiff = (this.options.x + (this.options.renderOptions.width / 2)) - (monster.options.x + (monster.options.width / 2))
+    , yDiff = (this.options.y + (this.options.renderOptions.height / 2)) - (monster.options.y + (monster.options.height / 2))
+
+  this.options.x = this.options.x + xDiff * 2
+  this.options.y = this.options.y + yDiff * 2
+  this.options.hp = this.options.hp - ~~(monster.options.difficulty / 30)
+}
+
 /////////////
 // private //
 /////////////
@@ -89,6 +114,10 @@ var checkForLevelUp = function() {
 
     // increase speed
     this.options.stepSize = Math.min(this.options.stepSize + 1, 10)
+
+    // increase health points
+    this.options.originalHp = this.options.originalHp + 2
+    this.options.hp = this.options.originalHp
 
     // increate the level
     this.options.experience.level++
