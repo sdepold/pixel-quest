@@ -70,7 +70,7 @@ window.PixelQuest.Game = (function() {
 
       var text = [
         "Level: " + player.object.options.experience.level,
-        "HP: " + 10,
+        "HP: " + player.object.options.hp + "/" + player.object.options.originalHp,
         "XP: " + player.object.options.experience.current + "/" + player.object.options.experience.neededForLevelUp
       ].join("      ")
 
