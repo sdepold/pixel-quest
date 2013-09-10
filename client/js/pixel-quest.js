@@ -58,7 +58,7 @@ window.PixelQuest = (function() {
     this.socket.on('player#update', function(_player) {
       var player = self.game.getObject(_player.id)
 
-      ;(['experience', 'achievements']).forEach(function(field) {
+      ;(['experience', 'achievements', 'x', 'y', 'hp']).forEach(function(field) {
         player.object.options[field] = _player.options[field]
       })
     })
