@@ -237,7 +237,7 @@ window.PixelQuest.Renderers.Player = (function() {
 
   var renderLevelUp = function(ctx) {
     if (this.renderOptions.levelUp.levelUp) {
-      this.renderOptions.levelUp.step = this.renderOptions.levelUp.step + 0.1
+      this.renderOptions.levelUp.step = this.renderOptions.levelUp.step + 0.05
 
       var px = this.object.options.renderOptions.pixelSize
         , x  = this.object.options.x + ~~(this.object.options.renderOptions.width / 2)
@@ -246,10 +246,9 @@ window.PixelQuest.Renderers.Player = (function() {
       y = y - this.renderOptions.levelUp.step * px
 
       ctx.fillStyle = this.object.options.renderOptions.colors.outline
-      ctx.fillRect(x, y, px * 2, px * 2)
-      ctx.fillRect(x, y, px * -2, px * 2)
-      ctx.fillRect(x - px, y + px, px * 2, px * 2)
-      ctx.fillRect(x - px, y + px, px * 2, px * -2)
+      ctx.font = "bold 12px sans-serif"
+      ctx.textAlign = 'center'
+      ctx.fillText("Lvl up!", x, y)
 
       if (this.renderOptions.levelUp.step > 10) {
         this.renderOptions.levelUp.levelUp = false

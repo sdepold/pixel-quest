@@ -25,7 +25,7 @@ window.PixelQuest.Game = (function() {
     renderMountains.call(this, 240, "#beaea2", 9)
     renderMountains.call(this, 240, "#d8c6b8", 6)
     renderMountains.call(this, 240, "#FFE9DA", 3)
-    renderGrass.call(this)
+    // renderGrass.call(this)
     renderSun.call(this)
 
     Object.keys(this.objects).forEach(function(objectId) {
