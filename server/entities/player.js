@@ -4,8 +4,11 @@ var utils   = require('../utils.js')
 var Player = module.exports = function(id) {
   this.id        = id
   this.className = 'Player'
+  this.options   = this.getDefaults()
+}
 
-  this.options = {
+Player.prototype.getDefaults = function() {
+  return {
     x:             40,
     y:             280,
     movementDelay: 50,
@@ -29,14 +32,16 @@ var Player = module.exports = function(id) {
     renderOptions: {
       colors: {
         outline: "#2c3e50",
-        face:    "#FFFFFF"
+        face:    "#FFFFFF",
+        opacity: 1
       },
       width: 21,
       height: 14,
       pixelSize: 3,
       feet: {
         direction: 'down',
-        offset: 0
+        offset: 0,
+        delta: 0.25
       },
       weapon: {
         side: 'right',
@@ -48,9 +53,18 @@ var Player = module.exports = function(id) {
         levelUp: false,
         step:    0
       },
-      damages: []
+      damages: [],
+      death: {
+        dead:     false,
+        step:     0,
+        callback: null
+      }
     }
   }
+}
+
+Player.prototype.resurrect = function() {
+  this.options = this.getDefaults()
 }
 
 Player.prototype.update = function(data) {

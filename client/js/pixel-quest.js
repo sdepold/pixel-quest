@@ -68,6 +68,13 @@ window.PixelQuest = (function() {
       player.animateHit(damage)
     })
 
+    this.socket.on('player#died', function(playerId) {
+      var player = self.game.getObject(playerId)
+      player.animateDeath(function() {
+        self.socket.emit('player#resurrect', playerId)
+      })
+    })
+
     this.socket.on('player#joined', callback)
     this.socket.emit('player#join', { id: this.getPlayerId() })
   }

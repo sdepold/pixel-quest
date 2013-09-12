@@ -13,6 +13,11 @@ window.PixelQuest.Renderers.Player = (function() {
     }
   }
 
+  Player.prototype.animateDeath = function(callback) {
+    this.object.options.renderOptions.death.dead = true
+    this.object.options.renderOptions.death.callback = callback
+  }
+
   Player.prototype.animateExperience = function(exp) {
     var px = this.object.options.renderOptions.pixelSize
 
@@ -46,6 +51,7 @@ window.PixelQuest.Renderers.Player = (function() {
   }
 
   Player.prototype.render = function(ctx) {
+    renderDeath.call(this, ctx)
     renderLevelUp.call(this, ctx)
     renderBody.call(this, ctx)
     renderArms.call(this,ctx)
@@ -57,6 +63,10 @@ window.PixelQuest.Renderers.Player = (function() {
   }
 
   Player.prototype.move = function(direction, step) {
+    if (this.object.options.hp <= 0) {
+      return
+    }
+
     step = step || this.object.options.stepSize
 
     switch (direction) {
@@ -87,6 +97,22 @@ window.PixelQuest.Renderers.Player = (function() {
   /////////////
   // private //
   /////////////
+
+  var renderDeath = function(ctx) {
+    if (this.object.options.hp <= 0) {
+      this.object.options.renderOptions.feet.delta = 0.05
+      this.object.options.renderOptions.colors.opacity = this.object.options.renderOptions.colors.opacity - 0.005
+
+      if (this.object.options.renderOptions.colors.opacity <= 0) {
+        this.object.options.renderOptions.death.callback()
+        this.object.options.renderOptions.colors.outline = "#2c3e50"
+        this.object.options.renderOptions.colors.opacity = 1
+
+      } else {
+        this.object.options.renderOptions.colors.outline = 'rgba(255, 0, 0, ' + this.object.options.renderOptions.colors.opacity + ')'
+      }
+    }
+  }
 
   var renderBody = function(ctx) {
     var px = this.object.options.renderOptions.pixelSize
@@ -144,9 +170,9 @@ window.PixelQuest.Renderers.Player = (function() {
     ctx.fillRect(this.object.options.x + this.object.options.renderOptions.width - px * 3, y + this.object.options.renderOptions.height, px, feetLength - ~~this.object.options.renderOptions.feet.offset)
 
     if (this.object.options.renderOptions.feet.direction === 'up') {
-      this.object.options.renderOptions.feet.offset = this.object.options.renderOptions.feet.offset + 0.25
+      this.object.options.renderOptions.feet.offset = this.object.options.renderOptions.feet.offset + this.object.options.renderOptions.feet.delta
     } else {
-      this.object.options.renderOptions.feet.offset = this.object.options.renderOptions.feet.offset - 0.25
+      this.object.options.renderOptions.feet.offset = this.object.options.renderOptions.feet.offset - this.object.options.renderOptions.feet.delta
     }
 
     if (this.object.options.renderOptions.feet.offset >= ~~(feetLength / 2)) {

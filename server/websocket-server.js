@@ -67,6 +67,12 @@ WebSocket.prototype.observeEvents = function(socket) {
       socket.emit('player#joined', player)
     },
 
+    'player#resurrect': function(playerId) {
+      var player = this.world.getPlayer(playerId)
+      player.resurrect()
+      socket.emit('player#update', player)
+    },
+
     'player#attack': function(playerId) {
       var player = this.world.getPlayer(playerId)
 
@@ -123,14 +129,21 @@ WebSocket.prototype.syncWorld = function() {
     var player = self.world.getPlayer(playerIdOfSocket)
       , socket = self.sockets[playerIdOfSocket]
       , data   = self.world.getSyncData(playerIdOfSocket)
-      , hitBy  = player.checkForAttacks(data.Monster)
 
-    if (!!hitBy) {
-      // the player has been hit and needs an update
-      socket.emit('player#update', player)
-      socket.emit('player#hit', player.id, hitBy.options.damage)
+    if (player.options.hp > 0) {
+      var hitBy  = player.checkForAttacks(data.Monster)
+
+      if (!!hitBy) {
+        // the player has been hit and needs an update
+        socket.emit('player#update', player)
+
+        if (player.options.hp <= 0) {
+          socket.emit('player#died', player.id)
+        } else {
+          socket.emit('player#hit', player.id, hitBy.options.damage)
+        }
+      }
     }
-
 
     // console.log('Emitting world#sync with the following arguments', players)
 
