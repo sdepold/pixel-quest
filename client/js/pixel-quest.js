@@ -75,6 +75,10 @@ window.PixelQuest = (function() {
       })
     })
 
+    this.socket.on('player#reset', function(playerId) {
+      self.game.getObject(playerId).resetStats()
+    })
+
     this.socket.on('player#joined', callback)
     this.socket.emit('player#join', { id: this.getPlayerId() })
   }

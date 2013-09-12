@@ -13,6 +13,16 @@ window.PixelQuest.Renderers.Player = (function() {
     }
   }
 
+  Player.prototype.resetStats = function() {
+    this.object.options.renderOptions.colors.outline = "#2c3e50"
+    this.object.options.renderOptions.colors.opacity = 1
+    this.object.options.renderOptions.feet.delta = 0.25
+  }
+
+  Player.prototype.alive = function() {
+    return this.object.options.hp > 0
+  }
+
   Player.prototype.animateDeath = function(callback) {
     this.object.options.renderOptions.death.dead = true
     this.object.options.renderOptions.death.callback = callback
@@ -63,7 +73,7 @@ window.PixelQuest.Renderers.Player = (function() {
   }
 
   Player.prototype.move = function(direction, step) {
-    if (this.object.options.hp <= 0) {
+    if (!this.alive()) {
       return
     }
 
@@ -99,15 +109,12 @@ window.PixelQuest.Renderers.Player = (function() {
   /////////////
 
   var renderDeath = function(ctx) {
-    if (this.object.options.hp <= 0) {
+    if (!this.alive()) {
       this.object.options.renderOptions.feet.delta = 0.05
       this.object.options.renderOptions.colors.opacity = this.object.options.renderOptions.colors.opacity - 0.005
 
       if (this.object.options.renderOptions.colors.opacity <= 0) {
         this.object.options.renderOptions.death.callback()
-        this.object.options.renderOptions.colors.outline = "#2c3e50"
-        this.object.options.renderOptions.colors.opacity = 1
-
       } else {
         this.object.options.renderOptions.colors.outline = 'rgba(255, 0, 0, ' + this.object.options.renderOptions.colors.opacity + ')'
       }
@@ -140,8 +147,15 @@ window.PixelQuest.Renderers.Player = (function() {
 
     // eyes
     ctx.fillStyle = this.object.options.renderOptions.colors.outline
-    ctx.fillRect(this.object.options.x + px * 2, y + px, px, px)
-    ctx.fillRect(this.object.options.x + this.object.options.renderOptions.width - px * 3, y + px, px, px)
+
+    if (this.alive()) {
+      ctx.fillRect(this.object.options.x + px * 2, y + px, px, px)
+      ctx.fillRect(this.object.options.x + this.object.options.renderOptions.width - px * 3, y + px, px, px)
+    } else {
+      ctx.font = "normal 10px sans-serif"
+      ctx.fillText('x', this.object.options.x + px * 1.5, y + 3 * px)
+      ctx.fillText('x', this.object.options.x + this.object.options.renderOptions.width - px * 3, y + 3 * px)
+    }
   }
 
   var renderArms = function(ctx) {
