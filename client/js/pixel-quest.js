@@ -58,9 +58,14 @@ window.PixelQuest = (function() {
     this.socket.on('player#update', function(_player) {
       var player = self.game.getObject(_player.id)
 
-      ;(['experience', 'achievements', 'x', 'y', 'hp']).forEach(function(field) {
+      ;(['experience', 'achievements', 'x', 'y', 'hp', 'originalHp']).forEach(function(field) {
         player.object.options[field] = _player.options[field]
       })
+    })
+
+    this.socket.on('player#hit', function(playerId, damage) {
+      var player = self.game.getObject(playerId)
+      player.animateHit(damage)
     })
 
     this.socket.on('player#joined', callback)

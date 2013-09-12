@@ -35,6 +35,7 @@ WebSocket.prototype.observeEvents = function(socket) {
 
       if (!!player) {
         delete data.options.renderOptions.experience
+        delete data.options.renderOptions.damages
         delete data.options.renderOptions.levelUp
         player.options = Utils.extend(player.options, data.options, ['x', 'y', 'attacking', 'renderOptions'])
       }
@@ -122,10 +123,12 @@ WebSocket.prototype.syncWorld = function() {
     var player = self.world.getPlayer(playerIdOfSocket)
       , socket = self.sockets[playerIdOfSocket]
       , data   = self.world.getSyncData(playerIdOfSocket)
+      , hitBy  = player.checkForAttacks(data.Monster)
 
-    if (player.checkForAttacks(data.Monster)) {
+    if (!!hitBy) {
       // the player has been hit and needs an update
       socket.emit('player#update', player)
+      socket.emit('player#hit', player.id, hitBy.options.damage)
     }
 
 

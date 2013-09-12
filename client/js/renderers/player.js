@@ -29,6 +29,18 @@ window.PixelQuest.Renderers.Player = (function() {
     this.renderOptions.levelUp.step = 0
   }
 
+  Player.prototype.animateHit = function(dmg) {
+    var px = this.object.options.renderOptions.pixelSize
+
+    this.object.options.renderOptions.damages.push({
+      value: dmg,
+      step:  0,
+      x:     this.object.options.x + (Math.random() * this.object.options.renderOptions.width),
+      y:     this.object.options.y - 2 * px
+    })
+
+  }
+
   Player.prototype.update = function(player) {
     this.object = player
   }
@@ -41,6 +53,7 @@ window.PixelQuest.Renderers.Player = (function() {
     renderHair.call(this, ctx)
     renderFeet.call(this, ctx)
     renderExperience.call(this, ctx)
+    renderDamage.call(this, ctx)
   }
 
   Player.prototype.move = function(direction, step) {
@@ -255,6 +268,23 @@ window.PixelQuest.Renderers.Player = (function() {
         this.renderOptions.levelUp.step = 0
       }
     }
+  }
+
+  var renderDamage = function(ctx) {
+    var self = this
+
+    ctx.font = "bold 12px sans-serif"
+
+    this.object.options.renderOptions.damages = this.object.options.renderOptions.damages.filter(function(dmg, i) {
+      dmg.step = dmg.step + 0.2
+
+      var opacity = 1 - dmg.step / 10
+
+      ctx.fillStyle = 'rgba(192, 57, 43, ' + opacity + ')'
+      ctx.fillText("-" + dmg.value, dmg.x, dmg.y - dmg.step)
+
+      return dmg.step < 10
+    })
   }
 
   return Player

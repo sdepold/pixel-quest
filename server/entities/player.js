@@ -47,7 +47,8 @@ var Player = module.exports = function(id) {
       levelUp: {
         levelUp: false,
         step:    0
-      }
+      },
+      damages: []
     }
   }
 }
@@ -71,17 +72,17 @@ Player.prototype.killedMonster = function(monster) {
 }
 
 Player.prototype.checkForAttacks = function(monsters) {
-  var self       = this
-    , hasBeenHit = false
+  var self         = this
+    , hasBeenHitBy = null
 
   monsters.forEach(function(monster) {
-    if (!hasBeenHit && monster.inAttackRange(self)) {
-      hasBeenHit = true
+    if (!hasBeenHitBy && monster.inAttackRange(self)) {
+      hasBeenHitBy = monster
       self.hit(monster)
     }
   })
 
-  return hasBeenHit
+  return hasBeenHitBy
 }
 
 Player.prototype.hit = function(monster) {
@@ -90,7 +91,8 @@ Player.prototype.hit = function(monster) {
 
   this.options.x = this.options.x + xDiff * 2
   this.options.y = this.options.y + yDiff * 2
-  this.options.hp = this.options.hp - ~~(monster.options.difficulty / 30)
+  this.options.hp = this.options.hp - monster.options.damage
+  this.options.renderOptions.hit
 }
 
 /////////////

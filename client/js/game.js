@@ -79,10 +79,13 @@ window.PixelQuest.Game = (function() {
       this.ctx.textAlign = 'right'
       this.ctx.fillText(
         [
+          "Quest:",
           "Kill",
           player.object.options.achievements.current.needed - player.object.options.achievements.current.achieved,
           player.object.options.achievements.current.colorName,
-          'monsters.'
+          'monsters.',
+          player.object.options.achievements.current.experience,
+          'XP.'
         ].join(" "),
         window.innerWidth - 10,
         textY

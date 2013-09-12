@@ -14,6 +14,7 @@ var Monster = module.exports = function() {
     x:          Math.random() * 1000,
     y:          220 + Math.random() * 600,
     difficulty: weight,
+    damage:     ~~(weight / 30),
     height:     weight,
     width:      weight,
     color:      '#' + Monster.getRandomColor(),
