@@ -66,8 +66,21 @@ var compressJsFiles = function() {
   fs.writeFileSync(targetFolder + '/client/pixel-quest.js', UglifyJS.minify(paths).code);
 
   paths = exec('ls -1 ' + __dirname + '/../server/').split('\n')
+
+
+
   paths.forEach(function(path) {
-    fs.writeFileSync(targetFolder + '/server/' + path, UglifyJS.minify(__dirname + '/../server/' + path).code)
+    if (path === 'entities') {
+      _paths = exec('ls -1 ' + __dirname + '/../server/entities').split('\n')
+      execSync('mkdir -p ' + __dirname + '/../server/entities')
+      _paths.forEach(function(_path) {
+        var content = UglifyJS.minify(__dirname + '/../server/entities/' + _path).code
+        fs.writeFileSync(targetFolder + '/server/entities/' + _path, content)
+      })
+    } else {
+      var content = UglifyJS.minify(__dirname + '/../server/' + path).code
+      fs.writeFileSync(targetFolder + '/server/' + path, content)
+    }
   })
 }
 
