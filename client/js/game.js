@@ -16,9 +16,15 @@ window.PixelQuest.Game = (function() {
     var self = this
 
     this.setSize()
+
     this.ctx.fillStyle = "#FFE9DA"
     this.ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
 
+    // disable shadow
+    this.ctx.shadowOffsetX = 0
+    this.ctx.shadowOffsetY = 0
+    this.ctx.shadowBlur = 0
+    this.ctx.shadowColor = null
 
     renderSky.call(this, 240)
     renderMountains.call(this, 240, "#ffffff", 10)
