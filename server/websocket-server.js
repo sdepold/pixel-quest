@@ -25,6 +25,7 @@ WebSocket.prototype.listen = function() {
 
   setInterval(function() {
     self.checkForDisconnectedClients()
+    self.world.iterate()
     self.syncWorld()
   }, 10)
 }

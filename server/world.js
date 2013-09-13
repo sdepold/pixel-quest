@@ -56,13 +56,13 @@ World.prototype.getMonsters = function(options) {
   return Object.keys(this.monsters).map(function(id) {
     return self.monsters[id]
   }).filter(function(monster) {
-    if (options.alive) {
-      monster.iterate()
-      return monster.alive()
-    } else {
-      monster.iterate()
-      return monster
-    }
+    return (options.alive) ? monster.alive() : !!monster
+  })
+}
+
+World.prototype.iterate = function() {
+  this.getMonsters({ alive: true }).forEach(function(monster) {
+    monster.iterate()
   })
 }
 
