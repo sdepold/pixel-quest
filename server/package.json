@@ -7,7 +7,7 @@
     "start": "node app.js",
     "check": "node utils/check_size.js",
     "build": "node utils/build.js",
-    "build-zip": "npm run build; zip -r -9 dist-server.zip ./dist/app.js ./dist/server; zip -r -9 dist-client.zip ./dist/client; rm -rf ./dist"
+    "build-zip": "npm run build; pushd ../dist/server; zip -r -9 ../../server.zip .; popd; pushd ../dist/client; zip -r -9 ../../client.zip .; popd; rm -rf ../dist"
   },
   "repository": "",
   "author": "",

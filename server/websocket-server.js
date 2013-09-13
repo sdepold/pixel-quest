@@ -1,5 +1,5 @@
-var io    = require('socket.io')
-  , World = require('./world.js')
+var io     = require('socket.io')
+  , World  = require('./world.js')
   , Player = require('./entities/player.js')
   , Utils  = require('./utils')
 
