@@ -14,15 +14,15 @@ var exec = function(cmd, showStdOut) {
 
 exec('cd ' + __dirname + '/..; npm run build-zip')
 
-var sizeClient = exec('cd ' + __dirname + '/..; ls -ila dist-client.zip').split(/ /g).filter(function(i) {
+var sizeClient = exec('cd ' + __dirname + '/../..; ls -ila client.zip').split(/ /g).filter(function(i) {
   return i !== ''
 })[5]
 
-var sizeServer = exec('cd ' + __dirname + '/..; ls -ila dist-server.zip').split(/ /g).filter(function(i) {
+var sizeServer = exec('cd ' + __dirname + '/../..; ls -ila server.zip').split(/ /g).filter(function(i) {
   return i !== ''
 })[5]
 
-exec('cd ' + __dirname + '/..; rm dist*.zip')
+exec('cd ' + __dirname + '/../..; rm dist*.zip')
 
 console.log('Size of client zipfile: ', sizeClient)
 console.log('Left: ', 13312 - sizeClient)
