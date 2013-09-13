@@ -19,7 +19,7 @@ Player.prototype.getDefaults = function() {
     strength:      2,
     attacking:     false,
     originalHp:    20,
-    hp:            1,
+    hp:            20,
     experience: {
       level: 1,
       current: 0,
