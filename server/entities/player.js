@@ -178,6 +178,6 @@ var generateAchievement = function() {
     colorName:  Monster.COLORS[color],
     achieved:   0,
     needed:     needed,
-    experience: needed * ~~(Math.random() * 50)
+    experience: needed * 15 * (1 + ~~(Math.random() * 50))
   }
 }
