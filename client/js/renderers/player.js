@@ -36,6 +36,7 @@ window.PixelQuest.Renderers.Player = (function() {
 
   Player.prototype.animateDeath = function(callback) {
     this.object.options.renderOptions.death.dead = true
+    this.object.options.renderOptions.death.step = 0
     this.renderOptions.death.callback = callback
   }
 
@@ -128,10 +129,34 @@ window.PixelQuest.Renderers.Player = (function() {
       this.object.options.renderOptions.feet.delta = 0.05
       this.object.options.renderOptions.colors.opacity = this.object.options.renderOptions.colors.opacity - 0.005
 
+      var color = 'rgba(255, 0, 0, ' + this.object.options.renderOptions.colors.opacity + ')'
+
       if (this.object.options.renderOptions.colors.opacity <= 0) {
         this.renderOptions.death.callback && this.renderOptions.death.callback()
       } else {
-        this.object.options.renderOptions.colors.outline = 'rgba(255, 0, 0, ' + this.object.options.renderOptions.colors.opacity + ')'
+        this.object.options.renderOptions.colors.outline = color
+      }
+
+      var px = this.object.options.renderOptions.pixelSize
+        , x  = this.object.options.x + ~~(this.object.options.renderOptions.width / 2)
+        , y  = this.object.options.y + 2*px - this.object.options.renderOptions.death.step
+
+      ctx.font = "bold 12px sans-serif"
+      ctx.fillStyle = color
+      ctx.textAlign = 'center'
+
+      ctx.fillText('I had', x, y)
+
+      if (this.object.options.renderOptions.death.step > (2 * px)) {
+        ctx.fillText('bad', x, y + px * 4)
+      }
+
+      if (this.object.options.renderOptions.death.step > (6 * px)) {
+        ctx.fillText('luck', x, y + px * 8)
+      }
+
+      if (this.object.options.renderOptions.death.step < 14 * px) {
+        this.object.options.renderOptions.death.step = this.object.options.renderOptions.death.step + 0.45
       }
     }
   }
@@ -168,6 +193,8 @@ window.PixelQuest.Renderers.Player = (function() {
       ctx.fillRect(this.object.options.x + this.object.options.renderOptions.width - px * 3, y + px, px, px)
     } else {
       ctx.font = "normal 10px sans-serif"
+      ctx.textAlign = 'left'
+
       ctx.fillText('x', this.object.options.x + px * 1.5, y + 3 * px)
       ctx.fillText('x', this.object.options.x + this.object.options.renderOptions.width - px * 3, y + 3 * px)
     }
@@ -249,7 +276,7 @@ window.PixelQuest.Renderers.Player = (function() {
     ctx.rotate(-angle)
     ctx.translate(-x, -y)
 
-    if (this.object.options.attacking)  {
+    if (this.alive() && this.object.options.attacking)  {
       if (this.object.options.renderOptions.weapon.direction === 'down') {
         this.object.options.renderOptions.weapon.angle = this.object.options.renderOptions.weapon.angle - 0.1
       } else {
