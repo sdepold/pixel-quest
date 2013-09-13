@@ -1,17 +1,11 @@
 var Player  = require('./entities/player.js')
   , Monster = require('./entities/monster.js')
-  , House   = require('./entities/house.js')
 
 var World = module.exports = function() {
   var self = this
 
   this.players = {}
   this.monsters = {}
-  this.environment = {
-    houses: []
-  }
-
-  // generateEnvironment.call(this)
 
   setInterval(function() {
     if (self.getMonsters({ alive: true }).length < 10) {
@@ -134,17 +128,6 @@ World.prototype.getOtherPlayers = function(id) {
 World.prototype.getSyncData = function(playerIdOfSocket) {
   return {
     Player:  this.getOtherPlayers(playerIdOfSocket),
-    Monster: this.getMonsters({ alive: true }),
-    House:   this.environment.houses
-  }
-}
-
-/////////////
-// private //
-/////////////
-
-var generateEnvironment = function() {
-  for (var i = 0; i < 20; i++) {
-    this.environment.houses.push(new House())
+    Monster: this.getMonsters({ alive: true })
   }
 }

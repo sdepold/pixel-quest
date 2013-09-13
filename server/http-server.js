@@ -9,7 +9,7 @@ var Server = module.exports = function() {
 }
 
 Server.prototype.onRequest = function(req, res) {
-  utils.log("Request: " + req.url)
+  // utils.log("Request: " + req.url)
 
   res.writeHead(200, { 'Content-Type': utils.contentTypeForUrl(req.url) })
 

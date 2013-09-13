@@ -55,7 +55,11 @@ window.PixelQuest.Game = (function() {
   }
 
   Game.prototype.removeObject = function(object) {
-    delete this.objects[object.id]
+    var id = (typeof object === 'string') ? object : object.id
+
+    if (window.PixelQuest.Utils.getIdentifier() !== id) {
+      delete this.objects[id]
+    }
   }
 
   /////////////

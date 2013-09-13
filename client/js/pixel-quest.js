@@ -25,62 +25,78 @@ window.PixelQuest = (function() {
     })
   }
 
-  PixelQuest.prototype.getPlayerId = function() {
-    var id = window.PixelQuest.Utils.getIdentifier()
+  PixelQuest.prototype.connectToServer = function(callback) {
+    var self   = this
+    var events = {
+      "uuid": function(uuid) {
+        PixelQuest.Utils.setIdentifier(uuid)
+        self.socket.emit('player#join', uuid)
+      },
 
-    if (!id) {
-      id = window.PixelQuest.Utils.generateIdentifier()
-      window.PixelQuest.Utils.setIdentifier(id)
+      'player#joined': callback,
+
+      'world#sync': self.onWorldSync.bind(self),
+
+      'player#quit': function (playerId) {
+        self.game.removeObject(playerId)
+      },
+
+      'player#update': function(_player) {
+        var player = self.game.getObject(_player.id)
+          , fields = ['experience', 'achievements', 'x', 'y', 'hp', 'originalHp']
+
+        fields.forEach(function(field) {
+          player.object.options[field] = _player.options[field]
+        })
+      },
+
+      'monster#killed': function(monster) {
+        self.game.removeObject(monster)
+      },
+
+      'player#experience': function(player, exp) {
+        self.game.getObject(player.id).animateExperience(exp)
+      },
+
+      'player#levelUp': function(player) {
+        self.game.getObject(player.id).animateLevelUp()
+      },
+
+      'player#update': function(_player) {
+        var player = self.game.getObject(_player.id)
+          , fields = ['experience', 'achievements', 'x', 'y', 'hp', 'originalHp']
+
+        fields.forEach(function(field) {
+          player.object.options[field] = _player.options[field]
+        })
+      },
+
+      'player#hit': function(playerId, damage) {
+        var player = self.game.getObject(playerId)
+        player.animateHit(damage)
+      },
+
+      'player#died': function(playerId) {
+        var player = self.game.getObject(playerId)
+        player.animateDeath(function() {
+          self.socket.emit('player#resurrect', playerId)
+        })
+      },
+
+      'player#reset': function(playerId) {
+        self.game.getObject(playerId).resetStats()
+      }
     }
 
-    return id
-  }
+    self.socket = io.connect("http://" + document.location.host)
 
-  PixelQuest.prototype.connectToServer = function(callback) {
-    var self    = this
-
-    this.socket = io.connect("http://" + document.location.host)
-
-    this.socket.on('world#sync', this.onWorldSync.bind(this))
-
-    this.socket.on('monster#killed', function(monster) {
-      self.game.removeObject(monster)
+    Object.keys(events).forEach(function(eventName) {
+      self.socket.on(eventName, events[eventName])
     })
 
-    this.socket.on('player#experience', function(player, exp) {
-      self.game.getObject(player.id).animateExperience(exp)
-    })
 
-    this.socket.on('player#levelUp', function(player) {
-      self.game.getObject(player.id).animateLevelUp()
-    })
 
-    this.socket.on('player#update', function(_player) {
-      var player = self.game.getObject(_player.id)
 
-      ;(['experience', 'achievements', 'x', 'y', 'hp', 'originalHp']).forEach(function(field) {
-        player.object.options[field] = _player.options[field]
-      })
-    })
-
-    this.socket.on('player#hit', function(playerId, damage) {
-      var player = self.game.getObject(playerId)
-      player.animateHit(damage)
-    })
-
-    this.socket.on('player#died', function(playerId) {
-      var player = self.game.getObject(playerId)
-      player.animateDeath(function() {
-        self.socket.emit('player#resurrect', playerId)
-      })
-    })
-
-    this.socket.on('player#reset', function(playerId) {
-      self.game.getObject(playerId).resetStats()
-    })
-
-    this.socket.on('player#joined', callback)
-    this.socket.emit('player#join', { id: this.getPlayerId() })
   }
 
   PixelQuest.prototype.onWorldSync = function(type, data) {
@@ -89,6 +105,7 @@ window.PixelQuest = (function() {
 
     data.forEach(function(objectData) {
       var object = self.game.getObject(objectData.id)
+
 
       if (!!object) {
         object.update(objectData)

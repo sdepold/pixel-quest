@@ -3,14 +3,21 @@ window.PixelQuest.Renderers.Player = (function() {
 
   var Player = function(id, player) {
     this.id            = id
-    this.activePlayer  = (id === window.PixelQuest.Utils.getIdentifier())
     this.object        = player
     this.renderOptions = {
       levelUp: {
         levelUp: false,
         step:    0
+      },
+
+      death: {
+        callback: null
       }
     }
+  }
+
+  Player.prototype.isActivePlayer = function() { 
+    return this.id === window.PixelQuest.Utils.getIdentifier()
   }
 
   Player.prototype.resetStats = function() {
@@ -25,7 +32,7 @@ window.PixelQuest.Renderers.Player = (function() {
 
   Player.prototype.animateDeath = function(callback) {
     this.object.options.renderOptions.death.dead = true
-    this.object.options.renderOptions.death.callback = callback
+    this.renderOptions.death.callback = callback
   }
 
   Player.prototype.animateExperience = function(exp) {
@@ -61,6 +68,10 @@ window.PixelQuest.Renderers.Player = (function() {
   }
 
   Player.prototype.render = function(ctx) {
+    if (this.alive()) {
+      this.resetStats()
+    }
+
     renderDeath.call(this, ctx)
     renderLevelUp.call(this, ctx)
     renderBody.call(this, ctx)
@@ -114,7 +125,7 @@ window.PixelQuest.Renderers.Player = (function() {
       this.object.options.renderOptions.colors.opacity = this.object.options.renderOptions.colors.opacity - 0.005
 
       if (this.object.options.renderOptions.colors.opacity <= 0) {
-        this.object.options.renderOptions.death.callback()
+        this.renderOptions.death.callback && this.renderOptions.death.callback()
       } else {
         this.object.options.renderOptions.colors.outline = 'rgba(255, 0, 0, ' + this.object.options.renderOptions.colors.opacity + ')'
       }

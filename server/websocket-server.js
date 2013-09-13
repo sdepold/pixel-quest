@@ -14,20 +14,26 @@ WebSocket.prototype.listen = function() {
   var self = this
 
   this.io = io.listen(this.server.httpServer)
-
-  this.io.set('log level', 1);
-
   this.io.sockets.on('connection', function (socket) {
-    self.observeEvents(socket)
+    var uuid = Utils.generateIdentifier()
+
+    Utils.log("Generated uuid " + uuid)
+    socket.emit('uuid', uuid)
+    self.observeEvents(uuid, socket)
   })
+  this.io.set('log level', 1)
 
   setInterval(function() {
+    self.checkForDisconnectedClients()
     self.syncWorld()
   }, 10)
 }
 
-WebSocket.prototype.observeEvents = function(socket) {
+WebSocket.prototype.observeEvents = function(uuid, socket) {
   var self = this
+
+  socket.playerId    = uuid
+  this.sockets[uuid] = socket
 
   this.events = {
     'player#update': function(data) {
@@ -37,34 +43,23 @@ WebSocket.prototype.observeEvents = function(socket) {
         delete data.options.renderOptions.experience
         delete data.options.renderOptions.damages
         delete data.options.renderOptions.levelUp
+        delete data.options.online
+
+        player.updatedAt = +new Date()
         player.options = Utils.extend(player.options, data.options, ['x', 'y', 'attacking', 'renderOptions'])
       }
     },
 
-    'disconnect': function() {
-      // console.log('Player', socket.playerId, 'just quit the game.')
-      var player = this.world.getPlayer(socket.playerId)
-
-      if (!!player) {
-        // player.options = Utils.extend(player.options, {
-        //   online:       false,
-        //   offlineSince: +new Date()
-        // })
-      }
-    },
-
-    'player#join': function(data) {
-      socket.playerId       = data.id
-      this.sockets[data.id] = socket
-
-      var player = this.world.getPlayer(data.id, { create: true })
+    'player#join': function(playerId) {
+      var player = self.world.getPlayer(playerId, { create: true })
 
       player.options = Utils.extend(player.options, {
         online:       true,
         offlineSince: null
       })
 
-      socket.emit('player#joined', player)
+      Utils.log('Player joined '+ uuid)
+      this.sockets[playerId].emit('player#joined', player)
     },
 
     'player#resurrect': function(playerId) {
@@ -107,7 +102,7 @@ WebSocket.prototype.observeEvents = function(socket) {
   }
 
   Object.keys(this.events).forEach(function(eventName) {
-    socket.on(eventName, function() {
+    self.sockets[uuid].on(eventName, function() {
       // console.log('Received event', eventName, 'with the following arguments', arguments)
       self.events[eventName].apply(self, arguments)
     })
@@ -125,6 +120,21 @@ WebSocket.prototype.broadcast = function() {
 }
 
 
+WebSocket.prototype.checkForDisconnectedClients = function() {
+  var self = this
+
+  Object.keys(this.world.players).forEach(function(playerId) {
+    var player = self.world.getPlayer(playerId)
+
+    if (player.options.online && (Math.abs(+new Date() - player.updatedAt) > 10000)) {
+      Utils.log('Player ' + playerId + ' just quit the game.')
+
+      player.options.online = false
+      self.broadcast('player#quit', player.id)
+    }
+  })
+}
+
 WebSocket.prototype.syncWorld = function() {
   var self = this
 
@@ -133,7 +143,7 @@ WebSocket.prototype.syncWorld = function() {
       , socket = self.sockets[playerIdOfSocket]
       , data   = self.world.getSyncData(playerIdOfSocket)
 
-    if (player.options.hp > 0) {
+    if (player && player.options.hp > 0) {
       var hitBy  = player.checkForAttacks(data.Monster)
 
       if (!!hitBy) {

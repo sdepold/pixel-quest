@@ -4,6 +4,7 @@ var utils   = require('../utils.js')
 var Player = module.exports = function(id) {
   this.id        = id
   this.className = 'Player'
+  this.updatedAt = +new Date()
   this.options   = this.getDefaults()
 }
 
@@ -18,7 +19,7 @@ Player.prototype.getDefaults = function() {
     strength:      2,
     attacking:     false,
     originalHp:    20,
-    hp:            20,
+    hp:            1,
     experience: {
       level: 1,
       current: 0,
