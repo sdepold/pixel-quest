@@ -152,7 +152,7 @@ window.PixelQuest.Renderers.Player = (function() {
       }
 
       if (this.object.options.renderOptions.death.step > (6 * px)) {
-        ctx.fillText('luck', x, y + px * 8)
+        ctx.fillText('luck!', x, y + px * 8)
       }
 
       if (this.object.options.renderOptions.death.step < 14 * px) {

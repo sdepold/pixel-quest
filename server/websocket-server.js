@@ -134,6 +134,7 @@ WebSocket.prototype.checkForDisconnectedClients = function() {
 
       player.options.online = false
       self.broadcast('player#quit', player.id)
+      self.world.removePlayer(playerId)
     }
   })
 }

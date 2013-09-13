@@ -24,6 +24,10 @@ World.prototype.getPlayer = function(id, options) {
   return result
 }
 
+World.prototype.removePlayer = function(id) {
+  delete this.players[id]
+}
+
 World.prototype.setPlayer = function(id, data) {
   this.players[id] = data
 }

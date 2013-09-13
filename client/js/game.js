@@ -31,7 +31,6 @@ window.PixelQuest.Game = (function() {
     renderMountains.call(this, 240, "#beaea2", 9)
     renderMountains.call(this, 240, "#d8c6b8", 6)
     renderMountains.call(this, 240, "#FFE9DA", 3)
-    // renderGrass.call(this)
     renderSun.call(this)
 
     Object.keys(this.objects).forEach(function(objectId) {
@@ -160,39 +159,6 @@ window.PixelQuest.Game = (function() {
       px * 6 + this.environment.sun.offset,
       px * 6 + this.environment.sun.offset
     )
-  }
-
-  var renderGrass = function() {
-    var px   = 3
-      , self = this
-
-    if (this.environment.grass.length === 0) {
-      for (var i = 0, x = ~~(window.innerWidth / px * 4) + 1; i < x; i++) {
-        this.environment.grass.push(~~((Math.random() * (window.innerHeight - 240)) / px) + 1)
-      }
-    }
-
-    this.ctx.fillStyle = '#27ae60'
-
-    this.environment.grass.forEach(function(y, i) {
-      var x = i * 4 * px
-
-      self.ctx.fillRect(x, 240 + y * px, px, px * 2)
-      self.ctx.fillRect(x - px, 240 + y * px + 3*px, 3*px, px)
-      self.ctx.fillRect(x, 240 + y * px + 4*px, px, px)
-      self.ctx.fillRect(x + px, 240 + y * px - px, px, px)
-      self.ctx.fillRect(x - px, 240 + y * px - px, px, px)
-      self.ctx.fillRect(x + 2*px, 240 + y * px - 2*px, px, px)
-      self.ctx.fillRect(x - 2*px, 240 + y * px - 2*px, px, px)
-      self.ctx.fillRect(x + 3*px, 240 + y * px - px, px, px)
-      self.ctx.fillRect(x - 3*px, 240 + y * px - px, px, px)
-      self.ctx.fillRect(x + 2*px, 240 + y * px + 2*px, px, px)
-      self.ctx.fillRect(x - 2*px, 240 + y * px + 2*px, px, px)
-      self.ctx.fillRect(x + 3*px, 240 + y * px + px, px, px)
-      self.ctx.fillRect(x - 3*px, 240 + y * px + px, px, px)
-      self.ctx.fillRect(x + 4*px, 240 + y * px - px, px, 2*px)
-      self.ctx.fillRect(x - 4*px, 240 + y * px - px, px, 2*px)
-    })
   }
 
   return Game
