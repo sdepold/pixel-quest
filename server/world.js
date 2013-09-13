@@ -76,7 +76,7 @@ World.prototype.findAttackableMonsters = function(player) {
 
       return (
         // left side of the player is on the right of monster
-        ((player.options.x - maxRange) < (monster.options.x + maxRange)) &&
+        ((player.options.x - maxRange) < rightX) &&
 
         // right side of the player is on the right of the monster
         (rightX < (player.options.x + player.options.renderOptions.width)) &&

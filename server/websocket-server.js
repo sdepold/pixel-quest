@@ -65,10 +65,12 @@ WebSocket.prototype.observeEvents = function(uuid, socket) {
     'player#resurrect': function(playerId) {
       var player = this.world.getPlayer(playerId)
 
-      player.resurrect()
+      if (!!player) {
+        player.resurrect()
 
-      socket.emit('player#update', player)
-      socket.emit('player#reset', playerId)
+        socket.emit('player#update', player)
+        socket.emit('player#reset', playerId)
+      }
     },
 
     'player#attack': function(playerId) {

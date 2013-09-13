@@ -12,11 +12,15 @@ window.PixelQuest.Renderers.Player = (function() {
 
       death: {
         callback: null
+      },
+
+      attack: {
+        callback: null
       }
     }
   }
 
-  Player.prototype.isActivePlayer = function() { 
+  Player.prototype.isActivePlayer = function() {
     return this.id === window.PixelQuest.Utils.getIdentifier()
   }
 
@@ -111,7 +115,7 @@ window.PixelQuest.Renderers.Player = (function() {
   Player.prototype.attack = function(callback) {
     if (!this.object.options.attacking) {
       this.object.options.attacking      = true
-      this.object.options.attackCallback = callback
+      this.renderOptions.attack.callback = callback
     }
   }
 
@@ -254,9 +258,10 @@ window.PixelQuest.Renderers.Player = (function() {
 
       if (this.object.options.renderOptions.weapon.angle >= 1.4) {
         this.object.options.renderOptions.weapon.direction = 'down'
-        if (this.activePlayer && this.object.options.attackCallback) {
-          this.object.options.attackCallback()
-          this.object.options.attackCallback = null
+
+        if (this.isActivePlayer() && this.renderOptions.attack.callback) {
+          this.renderOptions.attack.callback()
+          this.renderOptions.attack.callback = null
         }
       } else if (this.object.options.renderOptions.weapon.angle <= 0) {
         this.object.options.renderOptions.weapon.direction = 'up'
