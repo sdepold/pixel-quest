@@ -18,7 +18,7 @@ WebSocket.prototype.listen = function() {
     var uuid = Utils.generateIdentifier()
 
     Utils.log("Generated uuid " + uuid)
-    socket.emit('uuid', uuid)
+    socket.emit('uuid', Utils.lzw_encode(uuid))
     self.observeEvents(uuid, socket)
   })
   this.io.set('log level', 1)
@@ -38,6 +38,7 @@ WebSocket.prototype.observeEvents = function(uuid, socket) {
 
   this.events = {
     'player#update': function(data) {
+      data = JSON.parse(Utils.lzw_decode(data))
       var player = this.world.getPlayer(data.id)
 
       if (!!player) {
@@ -52,6 +53,8 @@ WebSocket.prototype.observeEvents = function(uuid, socket) {
     },
 
     'player#join': function(playerId) {
+      playerId = Utils.lzw_decode(playerId)
+
       var player = self.world.getPlayer(playerId, { create: true })
 
       player.options = Utils.extend(player.options, {
@@ -60,21 +63,25 @@ WebSocket.prototype.observeEvents = function(uuid, socket) {
       })
 
       Utils.log('Player joined '+ uuid)
-      this.sockets[playerId].emit('player#joined', player)
+      this.sockets[playerId].emit('player#joined', Utils.lzw_encode(JSON.stringify(player)))
     },
 
     'player#resurrect': function(playerId) {
+      playerId = Utils.lzw_decode(playerId)
+
       var player = this.world.getPlayer(playerId)
 
       if (!!player) {
         player.resurrect()
 
-        socket.emit('player#update', player)
-        socket.emit('player#reset', playerId)
+        socket.emit('player#update', Utils.lzw_encode(JSON.stringify(player)))
+        socket.emit('player#reset', Utils.lzw_encode(playerId))
       }
     },
 
     'player#attack': function(playerId) {
+      playerId = Utils.lzw_decode(playerId)
+
       var player = this.world.getPlayer(playerId)
 
       if (player) {
@@ -85,18 +92,26 @@ WebSocket.prototype.observeEvents = function(uuid, socket) {
             if (!monster.alive()) {
               var stats = player.killedMonster(monster)
 
-              self.broadcast('monster#killed', monster)
-              self.broadcast('player#experience', player, stats.experience)
+              self.broadcast('monster#killed', Utils.lzw_encode(JSON.stringify(monster)))
+              self.broadcast(
+                'player#experience',
+                Utils.lzw_encode(JSON.stringify(player)),
+                Utils.lzw_encode(stats.experience)
+              )
 
               if (stats.achievement.done) {
-                self.broadcast('player#experience', player, stats.achievement.experience)
+                self.broadcast(
+                  'player#experience',
+                  Utils.lzw_encode(JSON.stringify(player)),
+                  Utils.lzw_encode(stats.achievement.experience)
+                )
               }
 
               if (stats.levelUp) {
-                self.broadcast('player#levelUp', player)
+                self.broadcast('player#levelUp', Utils.lzw_encode(JSON.stringify(player)))
               }
 
-              socket.emit('player#update', player)
+              socket.emit('player#update', Utils.lzw_encode(JSON.stringify(player)))
             }
           }
         })
@@ -133,7 +148,7 @@ WebSocket.prototype.checkForDisconnectedClients = function() {
       Utils.log('Player ' + playerId + ' just quit the game.')
 
       player.options.online = false
-      self.broadcast('player#quit', player.id)
+      self.broadcast('player#quit', Utils.lzw_encode(player.id))
       self.world.removePlayer(playerId)
     }
   })
@@ -152,12 +167,12 @@ WebSocket.prototype.syncWorld = function() {
 
       if (!!hitBy) {
         // the player has been hit and needs an update
-        socket.emit('player#update', player)
+        socket.emit('player#update', Utils.lzw_encode(JSON.stringify(player)))
 
         if (player.options.hp <= 0) {
-          socket.emit('player#died', player.id)
+          socket.emit('player#died', Utils.lzw_encode(player.id))
         } else {
-          socket.emit('player#hit', player.id, hitBy.options.damage)
+          socket.emit('player#hit', Utils.lzw_encode(player.id), Utils.lzw_encode(hitBy.options.damage))
         }
       }
     }
@@ -165,7 +180,7 @@ WebSocket.prototype.syncWorld = function() {
     // console.log('Emitting world#sync with the following arguments', players)
 
     Object.keys(data).forEach(function(klass) {
-      socket.emit('world#sync', klass, data[klass])
+      socket.emit('world#sync', Utils.lzw_encode(klass), Utils.lzw_encode(JSON.stringify(data[klass])))
     })
   })
 }
